@@ -1,0 +1,7 @@
+websockets>=11.0.3
+fastapi>=0.100.0
+uvicorn>=0.22.0
+deepgram-sdk>=3.2.0
+twilio>=8.0.0
+python-dotenv>=1.0.0
+requests>=2.31.0

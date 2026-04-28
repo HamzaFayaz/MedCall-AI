@@ -1,0 +1,15 @@
+# Virtual Environment
+voice-agent/
+
+# Environment variables
+.env
+.env.*
+
+# Python caches and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDEs
+.vscode/
+.idea/
