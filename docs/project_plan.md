@@ -10,7 +10,7 @@
   - *Why:* To establish a strict, validated list of staff for the AI agent to reference.
 - [x] **Process Patients:** Filter patient records and remap their medical history to our 25 specific doctors.
   - *Why:* To ensure all patient encounters map to our valid doctors, maintaining data consistency.
-- [x] **Clean `healthcare_qa.csv` Knowledge Base (Complete):**
+- [ ] **Clean `healthcare_qa.csv` Knowledge Base (Pending):**
   - *What:* Filter the general healthcare Q&A dataset to remove topics or treatments that fall outside the specialties of our 25 doctors.
   - *Why:* To prevent the AI Voice Agent from answering questions or promising treatments for conditions our hospital cannot handle.
 - [x] **Filter FHIR "Junk" Data for LLM (Complete):**
