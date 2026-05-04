@@ -32,18 +32,21 @@
   - *Fixed:* Immunizations de-duplicated by vaccine name, keeping most recent date only.
 - [x] **Run migration script** — All 25 doctors and 1,000+ patients successfully seeded into Supabase. ✅
 
-## Phase 5: System Architecture Design (Current)
-- [ ] **Define the full system architecture** — Map every component (Vapi, Deepgram, FastAPI, Supabase, ChromaDB) and how data flows between them during a live call.
-- [ ] **Design `ehr_server.py` API contract** — Define all endpoints, request/response schemas, and authentication strategy.
-- [ ] **Design the RAG pipeline architecture** — Define ChromaDB ingestion flow, embedding model choice, and retrieval strategy for `healthcare_qa.csv`.
-- [ ] **Design the Voice Agent tool-calling schema** — Define the exact function signatures and payloads the LLM will use to call the EHR API and RAG pipeline during a call.
-- [ ] **Design call state machine** — Map the full conversational state flow (Emergency Screen → Auth → Routing → Scheduling → Confirmation).
-- [ ] **Create architecture diagrams** — Produce component diagram, sequence diagram for a full call, and data flow diagram.
-- [ ] **Document all design decisions** — Record choices around LLM provider, embedding model, API auth, and latency targets.
+## Phase 5: System Architecture Design ✅ COMPLETE
+- [x] **Define the full system architecture** — WebRTC + Deepgram + LangGraph + FastAPI + Supabase + ChromaDB. See `docs/system_architecture.md`.
+- [x] **Design `ehr_server.py` API contract** — 9 endpoints defined with full request/response schemas. See `docs/component_architectures.md`.
+- [x] **Design the RAG pipeline architecture** — ChromaDB + `all-MiniLM-L6-v2` embeddings, cosine similarity, top-3 retrieval.
+- [x] **Design the Voice Agent tool-calling schema** — 7 tools mapped to specific LangGraph nodes with restricted access per node.
+- [x] **Design call state machine** — 8 nodes (AUTH → ROUTING → SCHEDULING → CONFIRM + NEW_PATIENT, FAQ, CROSS_COVERAGE, EMERGENCY) with conditional edges.
+- [x] **Create architecture diagrams** — High-level system diagram, sequence diagram, state machine diagram, per-component internal architecture.
+- [x] **Document all design decisions** — WebRTC over Vapi, LangGraph state machine over ReAct, Deepgram Nova-2 for STT, latency budget < 2s.
 
-## Phase 6: API & Integration Development (Pending)
-- Build `ehr_server.py` FastAPI backend (connecting to Supabase).
-- Build `rag_pipeline.py` — ingest `healthcare_qa.csv` into ChromaDB.
-- Build and configure the Voice Agent (Vapi + LLM + tools).
-- Integrate all components end-to-end.
-- End-to-end testing via WebRTC and phone calls.
+## Phase 6: API & Integration Development (Next)
+- [ ] Build WebRTC frontend (`frontend/index.html`, `app.js`) — browser call interface.
+- [ ] Build `voice_server.py` — WebSocket handler bridging browser ↔ Deepgram ↔ LangGraph.
+- [ ] Build `ehr_server.py` FastAPI backend — all 9 REST endpoints connecting to Supabase.
+- [ ] Build `rag_pipeline.py` — ingest `healthcare_qa.csv` into ChromaDB.
+- [ ] Build `agent_graph.py` — LangGraph state machine with all 8 nodes.
+- [ ] Build tools (`src/tools/`) and prompts (`src/prompts/`) for each node.
+- [ ] Integrate all components end-to-end.
+- [ ] End-to-end testing via WebRTC browser calls.
