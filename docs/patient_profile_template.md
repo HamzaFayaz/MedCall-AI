@@ -45,7 +45,10 @@ This document defines the optimized, token-efficient JSON structure that the `eh
   "recent_visits": [
     {"date": "2014-11-24", "type": "Prenatal initial visit", "reason": "Normal pregnancy"}
   ],
-  "allergies": []
+  "allergies": [
+    {"allergy": "Allergy to bee venom", "criticality": "low"}
+  ],
+  "insurance": ["Cigna Health"]
 }
 ```
 
@@ -53,10 +56,11 @@ This document defines the optimized, token-efficient JSON structure that the `eh
 - **patient_info**: Extracted from `Patient` resource.
 - **recent_vitals**: Extracted from `Observation` resources (category: `vital-signs`). Only the most recent values.
 - **recent_lab_results**: Extracted from `Observation` resources (category: `laboratory`). Only the most recent panel.
-- **active_conditions**: Extracted from `Condition` resources where `clinicalStatus` is active/resolved.
-- **current_medications**: Extracted from `MedicationRequest` resources.
+- **active_conditions**: Extracted from `Condition` resources where `clinicalStatus` is `active`.
+- **current_medications**: Extracted from `MedicationRequest` resources where `status` is `active`.
 - **procedures**: Extracted from `Procedure` resources.
 - **immunizations**: Extracted from `Immunization` resources.
-- **ongoing_care_plans**: Extracted from `CarePlan` resources.
-- **recent_visits**: Extracted from `Encounter` resources.
-- **allergies**: Extracted from `AllergyIntolerance` resources (if present).
+- **ongoing_care_plans**: Extracted from `CarePlan` resources where `status` is `active`.
+- **recent_visits**: Extracted from `Encounter` resources, sorted by date descending, top 5 kept.
+- **allergies**: Extracted from `AllergyIntolerance` resources where `clinicalStatus` is `active`.
+- **insurance**: Extracted from `Coverage` resources contained within `ExplanationOfBenefit` entries.
