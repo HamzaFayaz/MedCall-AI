@@ -2,21 +2,22 @@
 
 This document tracks major architectural and design decisions made throughout the development of the Healthcare Patient Scheduler & Intake Voice Agent.
 
-## 1. Data Processing Architecture: On-the-fly FHIR Parsing
+## 1. Data Processing Architecture: Database Migration to Supabase
 
-**Date:** May 3, 2026
+**Date:** May 4, 2026
 
 **Context:** 
-The project utilizes Synthea-generated FHIR patient bundles (`data/processed/patients/`). These raw JSON files are massive (often 10,000+ lines) and contain a significant amount of administrative and billing noise (e.g., `Claim`, `ExplanationOfBenefit`) which would consume excessive tokens and degrade the performance of the AI Voice Agent. The agent requires a clean, concise clinical profile containing only demographics, vitals, active conditions, medications, procedures, immunizations, and recent visits.
+The project originally planned to utilize Synthea-generated FHIR patient bundles (`data/processed/patients/`) directly via an "on-the-fly" API parsing middleware. However, to better simulate a true production environment and demonstrate scalable cloud architecture, we pivoted to using a managed PostgreSQL database.
 
 **Alternatives Considered:**
-1. **Batch Pre-processing:** Run a script to clean all 1,000+ FHIR JSON files upfront and save the "clean" profiles to a new directory on disk.
-2. **On-the-fly API Middleware:** Keep the raw FHIR files untouched. Build the `ehr_server.py` API to fetch the raw JSON, apply filtering logic in memory, and return the clean profile dynamically when requested by the Voice Agent.
+1. **On-the-fly API Middleware (Local JSON):** Keep raw FHIR files untouched. Build the `ehr_server.py` API to fetch local files, parse them in memory, and return clean profiles.
+2. **Cloud Database (Supabase):** Extract the clean clinical data from the raw FHIR files *once* via a migration script, and store the structured data in a cloud-hosted PostgreSQL database (Supabase). The Voice Agent API will then query this database using standard SQL.
 
 **Decision:** 
-We chose **Option 2 (On-the-fly API Middleware)**.
+We chose **Option 2 (Cloud Database via Supabase)**.
 
 **Rationale:**
-*   **Simulates Enterprise Realities:** Real-world EHR systems (Epic, Cerner) do not allow external agents to copy or permanently alter their raw databases. The Voice Agent must query a secure API middleware layer that fetches and sanitizes data. This architecture perfectly mimics a production environment.
-*   **Single Source of Truth & Extensibility:** The raw FHIR bundle remains the untouched source of truth. If the Voice Agent's requirements change in the future (e.g., it suddenly needs to know the patient's `CareTeam` or Primary Care Provider), we only need to update the `ehr_server.py` filtering logic. If we had pre-processed and deleted the raw files, that data would be lost forever, requiring us to re-run the entire data generation pipeline.
-*   **Storage Efficiency:** Prevents duplicating thousands of files and maintaining two separate databases on disk.
+*   **Production-Grade Architecture:** Real-world enterprise systems (Epic, Cerner) use massive relational databases, not local JSON files. Connecting to a real SQL database mimics this architecture perfectly.
+*   **Performance:** Querying indexed SQL tables (e.g., finding available doctors or looking up a patient by phone number) is infinitely faster than iterating through local text files.
+*   **New Patient Creation:** Supabase handles `INSERT` operations (for new patient onboarding and appointment scheduling) safely and cleanly, without the risks of race conditions associated with writing to local JSON files.
+*   **Hybrid Storage:** We will use standard SQL columns for searchable data (Patient Demographics, Doctor Specialties) and leverage PostgreSQL's `JSONB` columns to efficiently store the nested medical history (conditions, medications) required by the LLM.
