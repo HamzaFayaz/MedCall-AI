@@ -7,7 +7,7 @@
 
 ## 1. Product Overview
 
-**What it is:** An AI-powered telephone receptionist for **Mercy General Hospital** (Seattle, WA). Patients can call in and speak naturally to the agent to handle all routine front-desk tasks without speaking to a human.
+**What it is:** An AI-powered voice receptionist for **Mercy General Hospital** (Seattle, WA). Patients connect over **WebRTC** (browser or app) and speak naturally to the agent to handle all routine front-desk tasks without speaking to a human.
 
 **Why it exists:** Hospital front desks spend 60–70% of their time on routine, repeatable tasks (booking, rescheduling, answering FAQs). This agent automates those tasks entirely, freeing staff for complex patient care.
 
@@ -63,11 +63,10 @@ All doctor data is stored as individual JSON files in `data/processed/doctors/` 
 
 | Component | Technology | Purpose |
 |---|---|---|
-| **Telephony** | Vapi | Manages the phone call lifecycle (PSTN bridge, call routing) |
+| **Real-time voice (primary)** | WebRTC | Peer connection and media path for bidirectional audio between patient client and backend/signaling; core transport for the voice agent |
 | **Speech-to-Text** | Deepgram | Real-time, low-latency transcription of patient speech |
-| **Fallback Telephony** | WebRTC | Browser-based audio if Vapi has regional restrictions (Pakistan) |
 | **LLM** | TBD (GPT-4o / Claude 3.5) | Core reasoning, intent recognition, response generation |
-| **TTS** | TBD (ElevenLabs / Vapi native) | Converts LLM text output back to voice |
+| **TTS** | TBD (e.g. ElevenLabs) | Converts LLM text output back to voice |
 
 ### Backend & Data
 
@@ -120,7 +119,7 @@ All doctor data is stored as individual JSON files in `data/processed/doctors/` 
 ## 6. Call Flow (Conversational State Machine)
 
 ```
-[INBOUND CALL]
+[WEBRTC SESSION START — patient audio connected]
       │
       ▼
 ┌─────────────────────────────────────────────────────────┐
@@ -222,6 +221,8 @@ Voice Agent/
 │
 ├── PRD.md                              ← YOU ARE HERE (single source of truth)
 │
+├── system design/                      ← Production architecture (Mermaid diagrams + components)
+│
 ├── docs/
 │   ├── project_plan.md                 ← Phase-by-phase progress tracker
 │   ├── features.md                     ← 6 core features in detail
@@ -276,7 +277,7 @@ Voice Agent/
 
 The data layer is complete and live. The next step is to **design the full system architecture** before writing a single line of application code. This includes:
 
-1. **Full System Component Diagram** — All services (Vapi, Deepgram, FastAPI, Supabase, ChromaDB) and their connections
+1. **Full System Component Diagram** — All services (WebRTC signaling/media path, Deepgram, FastAPI, Supabase, ChromaDB) and their connections
 2. **`ehr_server.py` API Contract** — Every endpoint, HTTP method, request params, response schema, and auth strategy
 3. **RAG Pipeline Architecture** — Embedding model selection, ChromaDB collection design, retrieval strategy
 4. **Voice Agent Tool-Calling Schema** — The exact JSON function definitions the LLM will use to call the EHR API and RAG system mid-call
