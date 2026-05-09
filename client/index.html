@@ -4,10 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voice Agent WebRTC Client</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
+        .controls { margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+        button { padding: 10px 20px; margin-right: 10px; cursor: pointer; font-size: 16px; }
+        #status { margin-top: 15px; font-weight: bold; }
+        .log-container { margin-top: 20px; background: #f4f4f4; padding: 10px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;}
+    </style>
 </head>
 <body>
-    <h1>Voice Agent</h1>
+    <h1>Healthcare Voice Agent</h1>
     <p>WebRTC Client Interface</p>
-    <!-- We will build out the WebRTC interface here later -->
+    
+    <div class="controls">
+        <button id="connectBtn">Connect to Agent</button>
+        <button id="disconnectBtn" disabled>Disconnect</button>
+        <div id="status">Status: Disconnected</div>
+    </div>
+
+    <!-- The audio element to play the agent's voice -->
+    <audio id="agentAudio" autoplay></audio>
+
+    <div class="log-container" id="logBox"></div>
+
+    <script src="/client/app.js"></script>
 </body>
 </html>
