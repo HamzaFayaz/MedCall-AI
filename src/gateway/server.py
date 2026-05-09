@@ -2,7 +2,11 @@ from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse
 from aiortc import RTCPeerConnection, RTCSessionDescription
 import uuid
+import asyncio
 from src.logger import logger
+
+from src.gateway.audio_track import AgentAudioTrack
+from src.adapters.stt_deepgram import DeepgramSTTAdapter
 
 webrtc_router = APIRouter(prefix="/webrtc", tags=["WebRTC Signaling"])
 
@@ -38,7 +42,26 @@ async def offer(request: Request):
     @pc.on("track")
     def on_track(track):
         logger.info(f"Track {track.kind} received for {session_id}")
-        # In Card 5, we will route this track to the STT adapter
+        if track.kind == "audio":
+            # 1. Setup the STT Adapter
+            stt = DeepgramSTTAdapter()
+            
+            async def on_transcript(text, is_final):
+                # For now, we just log it to the console to prove it works!
+                # In Card 6, this text will go to our Orchestrator graph.
+                if is_final:
+                    logger.info(f"🗣️ USER SAID (Final): {text}")
+                else:
+                    # Optional: uncomment if you want to see the real-time partial guessing
+                    # logger.info(f"   (partial): {text}")
+                    pass
+
+            stt.set_callback(on_transcript)
+            asyncio.create_task(stt.connect())
+
+            # 2. Create the bidirectional track and attach it
+            agent_track = AgentAudioTrack(track, stt)
+            pc.addTrack(agent_track)
         
     try:
         # Apply the client's offer

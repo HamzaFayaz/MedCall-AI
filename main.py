@@ -12,6 +12,12 @@ app.mount("/client", StaticFiles(directory="client", html=True), name="client")
 # Include API routers
 app.include_router(webrtc_router)
 
+from fastapi.responses import RedirectResponse
+
+@app.get("/")
+async def root():
+    return RedirectResponse(url="/client/")
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
