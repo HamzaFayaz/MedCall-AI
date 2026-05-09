@@ -5,7 +5,7 @@ websockets>=13.0
 
 # ── Voice & Realtime Layer (Component 02) ───────────
 aiortc>=1.14.0                # WebRTC: signaling, ICE, DTLS-SRTP, media
-deepgram-sdk>=7.0.0           # STT + TTS: streaming via Deepgram (Aura)
+deepgram-sdk>=3.0.0,<4.0.0    # STT + TTS: streaming via Deepgram (Aura)
 numpy>=1.26.0                 # Audio frame processing
 aiohttp>=3.9.0                # Async HTTP client for internal API calls
 
