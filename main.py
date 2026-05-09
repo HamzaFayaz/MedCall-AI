@@ -2,11 +2,15 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from src.logger import logger
+from src.gateway.server import webrtc_router
 
 app = FastAPI(title="Voice Agent System")
 
 # Mount the static client files
 app.mount("/client", StaticFiles(directory="client", html=True), name="client")
+
+# Include API routers
+app.include_router(webrtc_router)
 
 @app.get("/health")
 async def health_check():
