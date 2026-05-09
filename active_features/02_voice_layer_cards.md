@@ -44,7 +44,7 @@ graph TD
     *   Implement async generators to emit `transcript.partial` and `transcript.final` events.
 *   **Dependencies**: None *(Requires Deepgram API Key)*.
 
-### [ ] Card 4: Deepgram TTS Adapter
+### [x] Card 4: Deepgram TTS Adapter
 *   **Goal**: Connect to Deepgram's Aura API to convert agent text into speech.
 *   **Tasks**:
     *   Create `src/adapters/tts_deepgram.py`.
