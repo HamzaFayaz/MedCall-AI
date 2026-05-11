@@ -29,13 +29,13 @@ Use this file as a **backlog** when you are ready to deepen production readiness
 
 ### 2.1 Gap
 
-[`06-trust-security-operations.md`](06-trust-security-operations.md) mentions read replica failover in a runbook outline but does **not** define backup frequency, retention, **RTO/RPO**, or multi-region strategy for Supabase/Chroma and application state.
+[`06-trust-security-operations.md`](06-trust-security-operations.md) mentions read replica failover in a runbook outline but does **not** define backup frequency, retention, **RTO/RPO**, or multi-region strategy for Supabase data, Supabase vectors, and application state.
 
 ### 2.2 Remediation (detail)
 
 - **Supabase:** Enable **PITR** (point-in-time recovery) if available on your plan; document backup retention and restore drill (quarterly).
 - **RPO/RTO targets:** Example starter: RPO ≤ 15 minutes for appointment data, RTO ≤ 1 hour for full stack in primary region—tune after risk review.
-- **Chroma / RAG:** Define whether vectors are rebuildable from source artifacts; if yes, document rebuild pipeline; if no, include Chroma volumes in backup scope.
+- **Supabase Vector / RAG:** Define whether vectors are rebuildable from source artifacts; if yes, document rebuild pipeline; if no, include the vector table in backup scope.
 - **Orchestrator Redis (if used):** Classify as **cache vs durability**; if durable session recovery depends on it, enable persistence (AOF/RDB) or accept “reconnect may lose in-flight dialogue” and document UX.
 - **Runbook:** One-page restore order: DNS → gateway → orchestrator → EHR → verify `/readyz`.
 

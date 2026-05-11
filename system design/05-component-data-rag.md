@@ -1,6 +1,6 @@
-# Component design: data layer (Supabase) and RAG (ChromaDB)
+# Component design: data layer and RAG (Supabase + pgvector)
 
-This document ties **persistent data** to **LLM context** and **knowledge retrieval**, with emphasis on **minimization** and **scope control**—both are essential for a production healthcare-adjacent voice product.
+This document ties **persistent data** to **LLM context** and **knowledge retrieval**, with emphasis on **minimization** and **scope control**—both are essential for a production healthcare-adjacent voice product. The vector store is locked to **Supabase PostgreSQL with `pgvector`** so operational data and curated RAG knowledge share one managed platform.
 
 ---
 
@@ -65,7 +65,7 @@ flowchart TB
 ```mermaid
 flowchart LR
   Q["User question\n(or symptoms phrase)"] --> E["Embed query"]
-  E --> C["ChromaDB\nsimilarity search"]
+  E --> C["Supabase Vector\npgvector similarity search"]
   C --> F["Filter + hospital scope"]
   F --> R["Top-k chunks +\nsource ids"]
   R --> O2["Orchestrator"]
@@ -74,9 +74,9 @@ flowchart LR
 
 ### Ingestion (offline or batch)
 
-1. Load curated `healthcare_qa.csv` (+ optional `clinic_knowledge_base.md` chunks).
-2. Normalize text; deduplicate; attach metadata: `{topic, department, allowed_claims}`.
-3. Embed with a fixed model version; store vectors in Chroma with **collection version** tag.
+1. Load curated RAG data files from `data/knowledge_base/`: `mercy_general_operational_policy.md`, `department_services.md`, `symptom_department_routing_guide.md`, and `faq_and_call_scripts.md`.
+2. Normalize text; deduplicate; attach metadata: `{source_type, topic, department, allowed_claims, kb_version}`.
+3. Embed with a fixed model version; store vectors in a Supabase `knowledge_chunks` table with a **kb version** tag.
 
 ### Retrieval constraints (production)
 
@@ -91,7 +91,7 @@ flowchart LR
 | Artifact | Versioning |
 |----------|------------|
 | Embedding model | Pin model id + dimension in config. |
-| Chroma collection | `kb_v3` naming; keep `kb_v2` for rollback. |
+| Supabase vector table | `knowledge_chunks` rows include `kb_version`; keep prior versions queryable for rollback. |
 | `clinical_data` schema | Version field inside JSON; migrate with scripts. |
 
 ---

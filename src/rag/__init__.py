@@ -1,1 +1,1 @@
-# RAG - Medical knowledge retrieval (ChromaDB)
+# RAG - Medical knowledge retrieval (Supabase Vector / pgvector)

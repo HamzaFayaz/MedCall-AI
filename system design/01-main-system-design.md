@@ -27,7 +27,7 @@ This document is the **single top-level view** before drilling into per-componen
 
 ## 2. High-level context (C4-style)
 
-Patients use a **WebRTC client**. A **realtime gateway** terminates signaling and coordinates media with STT/TTS and the **conversation orchestrator**. The orchestrator calls the **EHR API** (FastAPI) and **RAG service**; persistent state lives in **Supabase**. External providers supply STT, LLM, and TTS.
+Patients use a **WebRTC client**. A **realtime gateway** terminates signaling and coordinates media with STT/TTS and the **conversation orchestrator**. The orchestrator calls the **EHR API** (FastAPI) and **RAG service**; persistent state and RAG vectors live in **Supabase**. External providers supply STT, LLM, and TTS.
 
 ```mermaid
 flowchart TB
@@ -40,7 +40,7 @@ flowchart TB
     Orch["Conversation orchestrator\n(flow graph + policies)"]
     EHR["EHR API\nFastAPI"]
     RAG["RAG service\n(embed + retrieve)"]
-    Chroma["ChromaDB"]
+    Vector["Supabase Vector\npgvector"]
     DB[(Supabase\nPostgreSQL)]
   end
 
@@ -57,7 +57,7 @@ flowchart TB
   Orch <-->|"HTTP / internal RPC"| GW
   Orch --> EHR
   Orch --> RAG
-  RAG --> Chroma
+  RAG --> Vector
   EHR --> DB
 ```
 
@@ -73,9 +73,9 @@ flowchart TB
 | **Realtime gateway** | WebRTC signaling; audio routing to STT; subscribe LLM/TTS streams; session heartbeat; backpressure. |
 | **Conversation orchestrator** | Current graph node, transitions, slot-filling, tool allowlists per node, confirmation tokens, audit events. |
 | **EHR API** | Patient lookup, profile summary, providers, availability, appointments; validates against DB and business rules. |
-| **RAG service** | Embed query, retrieve top-k from Chroma, apply hospital scope filters, return citations/snippets to orchestrator. |
+| **RAG service** | Embed query, retrieve top-k from Supabase Vector, apply hospital scope filters, return citations/snippets to orchestrator. |
 | **Supabase** | System of record for doctors, patients, profiles, appointments (per PRD schema). |
-| **ChromaDB** | Vector store over curated healthcare Q&A (no raw PHI requirement in MVP dataset). |
+| **Supabase Vector / `pgvector`** | Vector store over curated healthcare Q&A (no raw PHI requirement in MVP dataset). |
 
 ---
 
@@ -97,14 +97,14 @@ flowchart LR
 
   subgraph Data["Data tier"]
     DB2[(Supabase)]
-    Ch2[(ChromaDB)]
+    Vec2[(Supabase Vector\npgvector)]
   end
 
   GW2 --> Orch2
   Orch2 --> EHR2
   Orch2 --> RAG2
   EHR2 --> DB2
-  RAG2 --> Ch2
+  RAG2 --> Vec2
 ```
 
 **Production habits:** TLS everywhere; private connectivity to DB where available; secrets in a managed store; separate staging with anonymized data.
