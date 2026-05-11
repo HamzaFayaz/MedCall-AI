@@ -69,9 +69,9 @@ Voice Agent/
 │   │
 │   ├── rag/                            ← Medical knowledge retrieval
 │   │   ├── __init__.py
-│   │   ├── service.py                  ← Embed query → ChromaDB → return top-k
+│   │   ├── service.py                  ← Embed query → Supabase Vector → return top-k
 │   │   ├── embeddings.py               ← Embedding model setup
-│   │   └── ingest.py                   ← Ingest healthcare_qa.csv into ChromaDB
+│   │   └── ingest.py                   ← Ingest approved policy KB files into Supabase Vector
 │   │
 │   │── ── Shared ── ──
 │   │
@@ -127,7 +127,7 @@ flowchart TB
     end
 
     subgraph rag["src/rag/ (Component 05)"]
-        RAG["service.py → ChromaDB"]
+        RAG["service.py → Supabase Vector"]
     end
 
     HTML <-->|"WebRTC"| SIG
