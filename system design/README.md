@@ -10,7 +10,7 @@ This folder is the **architecture source** for the production-oriented voice int
 | 2 | [`02-component-voice-realtime.md`](02-component-voice-realtime.md) | WebRTC, signaling, media, STT/TTS streaming, latency budget |
 | 3 | [`03-component-orchestration.md`](03-component-orchestration.md) | Flow-based orchestration, emergency gate, tool-calling inside nodes, state machine |
 | 4 | [`04-component-backend-ehr.md`](04-component-backend-ehr.md) | API gateway pattern, `ehr_server` responsibilities, API contracts at a glance |
-| 5 | [`05-component-data-rag.md`](05-component-data-rag.md) | Supabase usage, ChromaDB RAG pipeline, data minimization for LLM context |
+| 5 | [`05-component-data-rag.md`](05-component-data-rag.md) | Supabase usage, pgvector RAG pipeline, data minimization for LLM context |
 | 6 | [`06-trust-security-operations.md`](06-trust-security-operations.md) | Security, privacy, auditability, SLOs, failure modes, human handoff |
 
 ## Architectural stance (summary)
