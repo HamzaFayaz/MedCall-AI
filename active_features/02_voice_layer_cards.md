@@ -63,7 +63,7 @@ graph TD
     *   Create a browser `RTCPeerConnection` and send the SDP offer to the backend.
 *   **Dependencies**: Requires **Card 1** to be finished.
 
-### [/] Card 5: Bidirectional Audio Track
+### [x] Card 5: Bidirectional Audio Track
 *   **Goal**: The core audio router. Connects the browser's audio to the AI stack.
 *   **Tasks**:
     *   Create `src/gateway/audio_track.py`.
@@ -72,7 +72,7 @@ graph TD
     *   **Outbound**: Route Card 4 (TTS) audio to the WebRTC speaker.
 *   **Dependencies**: Requires **Card 1**, **Card 3**, and **Card 4**.
 
-### [ ] Card 6: Session Manager
+### [x] Card 6: Session Manager
 *   **Goal**: Manage the lifecycle of a call and emit system events.
 *   **Tasks**:
     *   Create `src/gateway/session.py`.

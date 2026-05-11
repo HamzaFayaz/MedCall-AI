@@ -30,7 +30,16 @@ class DeepgramTTSAdapter:
             # Create a websocket connection using the async client
             self.connection = self.client.speak.asyncwebsocket.v("1")
 
-            async def on_audio_data(self_param, audio_data, **kwargs):
+            async def on_audio_data(*args, **kwargs):
+                # The SDK passes audio bytes in kwargs['data'] or possibly args
+                audio_data = kwargs.get('data')
+                
+                if not audio_data:
+                    for arg in args:
+                        if isinstance(arg, bytes):
+                            audio_data = arg
+                            break
+                
                 if not audio_data:
                     return
                 
@@ -71,18 +80,36 @@ class DeepgramTTSAdapter:
             logger.error(f"Could not connect to Deepgram TTS: {e}")
             return False
 
+    async def _check_connected(self):
+        if not self.connection:
+            return False
+        if hasattr(self.connection, "is_connected"):
+            res = self.connection.is_connected()
+            if asyncio.iscoroutine(res):
+                return await res
+            return res
+        return True
+
     async def send_text(self, text: str):
         """Send text to Deepgram for speech synthesis."""
-        if self.connection:
-            try:
-                # Send text for TTS processing
+        is_conn = await self._check_connected()
+        if not is_conn:
+            logger.info("TTS Connection closed or missing. Reconnecting...")
+            await self.connect()
+
+        try:
+            # Send text for TTS processing
+            await self.connection.send_text(text)
+        except Exception as e:
+            logger.warning(f"Error sending text to Deepgram TTS: {e}. Reconnecting...")
+            await self.connect()
+            if self.connection:
                 await self.connection.send_text(text)
-            except Exception as e:
-                logger.error(f"Error sending text to Deepgram TTS: {e}")
                 
     async def flush(self):
         """Flush the text buffer to force audio generation."""
-        if self.connection:
+        is_conn = await self._check_connected()
+        if is_conn:
             try:
                 await self.connection.flush()
             except Exception as e:
