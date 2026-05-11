@@ -1,15 +1,15 @@
 # Data Architecture & Integration Plan
 
 ## Overview
-This document outlines the production-grade data architecture for the AI Voice Agent. We are moving away from static markdown mock data and building a dynamic, EHR-compliant integration layer using FHIR standards and real-world Medical QA datasets.
+This document outlines the production-grade data architecture for the AI Voice Agent. We are moving away from unstructured mock-only data and building a dynamic, EHR-compliant integration layer using FHIR standards plus curated hospital policy knowledge for retrieval.
 
 ## Phase 1: Seed Data Acquisition
 We require two types of realistic data to test the agent safely:
 
-1.  **Medical Knowledge Base (Hugging Face)**
-    *   **Source:** `adrianf12/healthcare-qa-dataset`
-    *   **Format:** JSONL / CSV
-    *   **Purpose:** To feed our local Vector Database (ChromaDB) so the agent can accurately answer general medical questions and perform basic triage (e.g., distinguishing between a sprain and a break).
+1.  **Mercy General Policy Knowledge Base**
+    *   **Source:** Approved policy files in `data/knowledge_base/`
+    *   **Format:** Markdown chunks for Supabase Vector / `pgvector`
+    *   **Purpose:** To answer hospital FAQ, referral, insurance, appointment prep, and symptom-to-department routing questions without giving diagnosis or treatment advice.
 
 2.  **Patient & Provider Database (Synthea)**
     *   **Source:** Pre-generated Synthea Ecosystem Bundles
@@ -25,5 +25,5 @@ The agent will connect to these data sources via a simulated backend.
     *   The Voice Agent will be equipped with API tool-calling to ping these endpoints live during the call.
 
 2.  **`rag_pipeline.py` (The Knowledge Retriever)**
-    *   Ingests the QA dataset into a local ChromaDB instance.
+    *   Ingests the curated Mercy General policy KB into Supabase Vector / `pgvector`.
     *   Provides semantic search so the LLM can pull specific clinic policies and medical answers in milliseconds.

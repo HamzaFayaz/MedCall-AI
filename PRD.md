@@ -73,7 +73,7 @@ All doctor data is stored as individual JSON files in `data/processed/doctors/` 
 | Component | Technology | Purpose |
 |---|---|---|
 | **Mock EHR API** | FastAPI (`ehr_server.py`) | Simulates an Epic EHR; exposes patient/doctor/appointment endpoints |
-| **RAG Knowledge Base** | ChromaDB + `healthcare_qa.csv` | Semantic search for medical triage Q&A |
+| **RAG Knowledge Base** | Supabase Vector / `pgvector` + curated Mercy General policy KB | Semantic search for FAQ, policy, and care-routing answers |
 | **Database** | Supabase (PostgreSQL + JSONB) | Cloud-hosted, production-grade data store |
 | **Data Standard** | FHIR R4 JSON | Industry-standard medical record format |
 | **Data Generator** | Synthea | Source of realistic, HIPAA-safe fake patient & provider records |
@@ -100,8 +100,8 @@ All doctor data is stored as individual JSON files in `data/processed/doctors/` 
 - Book the appointment immediately after registration
 
 ### Feature 4: Conversational Medical Triage (RAG)
-- Listen for symptom descriptions and route them through the ChromaDB RAG pipeline
-- Return semantically matched answers from the medical QA dataset
+- Listen for symptom descriptions and route them through the Supabase Vector RAG pipeline
+- Return semantically matched answers from approved policy and routing knowledge
 - Hard restrictions: agent cannot diagnose, prescribe, or promise treatments outside the hospital's specialties
 
 ### Feature 5: Emergency Guardrails (Zero Tolerance)
@@ -237,14 +237,15 @@ Voice Agent/
 │   ├── processed/
 │   │   ├── doctors/                    ← 25 individual doctor JSON files
 │   │   └── patients/                   ← 1,000+ processed patient JSON files
-│   └── healthcare_qa.csv               ← Medical Q&A dataset (for RAG)
+│   ├── healthcare_qa.csv               ← Legacy tiny QA dataset (not primary RAG source)
+│   └── knowledge_base/                 ← Primary RAG source: policy, FAQ, routing guides
 │
 ├── scripts/
 │   ├── migrate_to_supabase.py          ← MAIN: migrates all data to Supabase ✅ DONE
 │   ├── supabase_setup.sql              ← DDL for all 4 Supabase tables
 │   ├── extract_25_doctors.py           ← Extracts doctors from raw FHIR
 │   ├── process_patients.py             ← Cleans & remaps patients to our doctors
-│   ├── download_qa_data.py             ← Downloads HuggingFace QA dataset
+│   ├── download_qa_data.py             ← Downloads legacy HuggingFace QA dataset
 │   ├── download_synthea_data.py        ← Downloads Synthea FHIR bundles
 │   ├── count_fhir_resources.py         ← Utility: count resource types
 │   └── test_extraction.py             ← Tests data extraction logic
@@ -264,7 +265,7 @@ Voice Agent/
 
 | Phase | Status | Summary |
 |---|---|---|
-| **Phase 1** — Data Downloading | ✅ Complete | Synthea FHIR + HuggingFace QA dataset acquired |
+| **Phase 1** — Data Downloading | ✅ Complete | Synthea FHIR acquired; legacy tiny HuggingFace QA dataset available |
 | **Phase 2** — Data Cleaning | ✅ Complete | 25 doctors extracted; patients processed & remapped; FHIR junk filtered |
 | **Phase 3** — Feature Definition | ✅ Complete | 6 features defined; EHR API functions outlined |
 | **Phase 4** — Database Setup & Migration | ✅ Complete | Supabase schema live; 25 doctors + 1,000+ patients seeded |
@@ -277,9 +278,9 @@ Voice Agent/
 
 The data layer is complete and live. The next step is to **design the full system architecture** before writing a single line of application code. This includes:
 
-1. **Full System Component Diagram** — All services (WebRTC signaling/media path, Deepgram, FastAPI, Supabase, ChromaDB) and their connections
+1. **Full System Component Diagram** — All services (WebRTC signaling/media path, Deepgram, FastAPI, Supabase with `pgvector`) and their connections
 2. **`ehr_server.py` API Contract** — Every endpoint, HTTP method, request params, response schema, and auth strategy
-3. **RAG Pipeline Architecture** — Embedding model selection, ChromaDB collection design, retrieval strategy
+3. **RAG Pipeline Architecture** — Embedding model selection, Supabase vector table design, retrieval strategy
 4. **Voice Agent Tool-Calling Schema** — The exact JSON function definitions the LLM will use to call the EHR API and RAG system mid-call
 5. **Call State Machine Diagram** — Formal state/transition diagram for the full call flow
 6. **Sequence Diagram** — Full call lifecycle from ring to hangup, showing every service interaction
