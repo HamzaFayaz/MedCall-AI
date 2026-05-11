@@ -19,7 +19,7 @@ This document outlines the six core capabilities of the Healthcare Patient Sched
 *   **API Integration:** Sending this data to the EHR backend (`POST /api/patients`) to instantly generate a new Patient ID, allowing the agent to book the appointment immediately.
 
 ## 4. Conversational Medical Triage (RAG Pipeline)
-*   **Knowledge Retrieval:** Listening to the patient's symptoms and using a local medical knowledge base (`healthcare_qa.csv` via ChromaDB) to answer general health questions accurately.
+*   **Knowledge Retrieval:** Listening to the patient's request and using the approved Supabase Vector policy knowledge base files to answer hospital FAQ and route symptoms to the right department safely.
 *   **Scope Restriction:** Restricting answers so the AI doesn't promise treatments for conditions the hospital doesn't handle.
 
 ## 5. Strict Emergency Guardrails
