@@ -210,6 +210,8 @@ Expected result shape:
 
 ### [ ] Card 6: Orchestrator Tool Contract
 
+Status: On hold. This card needs the orchestrator/LLM layer to exist first, so it is waiting for orchestrator/LLM implementation before work continues.
+
 Goal: Define how the LLM/orchestrator calls RAG.
 
 Tasks:
