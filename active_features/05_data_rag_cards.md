@@ -180,7 +180,7 @@ Tasks:
 - Call the Supabase RPC/search function for retrieval.
 - Return `content`, `source_file`, `section`, `topic`, `department`, and score.
 
-### [ ] Card 5: RAG Service API
+### [x] Card 5: RAG Service API
 
 Goal: Provide a clean application-facing retrieval function.
 
