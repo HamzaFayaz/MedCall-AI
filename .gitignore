@@ -20,3 +20,6 @@ Data/
 venv/
 
 code understanding/
+
+# Local embedding model binaries
+embedding_models/
