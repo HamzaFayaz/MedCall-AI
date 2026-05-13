@@ -8,20 +8,23 @@ This board breaks down the WebRTC and STT/TTS component into manageable "cards".
 graph TD
     %% Independent Cards
     C1["Card 1: WebRTC Signaling API"]
-    C3["Card 3: Deepgram STT Adapter"]
-    C4["Card 4: Deepgram TTS Adapter"]
+    C2["Card 2: Deepgram STT Adapter"]
+    C3["Card 3: Deepgram TTS Adapter"]
 
     %% Dependent Cards
-    C2["Card 2: Basic WebRTC Client"]
+    C4["Card 4: Basic WebRTC Client"]
     C5["Card 5: Bidirectional Audio Track"]
-    C6["Card 6: Session Manager"]
+    C6["Card 6: VAD & Barge-in"]
+    C7["Card 7: Session Manager"]
 
     %% Connections / Dependencies
-    C1 --> C2
+    C1 --> C4
     C1 --> C5
+    C2 --> C5
     C3 --> C5
     C4 --> C5
     C5 --> C6
+    C5 --> C7
 ```
 
 ---
@@ -36,7 +39,7 @@ graph TD
     *   Initialize `aiortc.RTCPeerConnection` and process the SDP offer/answer.
 *   **Dependencies**: None.
 
-### [x] Card 3: Deepgram STT Adapter
+### [x] Card 2: Deepgram STT Adapter
 *   **Goal**: Connect to Deepgram's Live streaming API to convert audio to text.
 *   **Tasks**:
     *   Create `src/adapters/stt_deepgram.py`.
@@ -44,7 +47,7 @@ graph TD
     *   Implement async generators to emit `transcript.partial` and `transcript.final` events.
 *   **Dependencies**: None *(Requires Deepgram API Key)*.
 
-### [x] Card 4: Deepgram TTS Adapter
+### [x] Card 3: Deepgram TTS Adapter
 *   **Goal**: Connect to Deepgram's Aura API to convert agent text into speech.
 *   **Tasks**:
     *   Create `src/adapters/tts_deepgram.py`.
@@ -55,7 +58,7 @@ graph TD
 
 ## 🟡 Dependent Feature Cards (Require other cards first)
 
-### [x] Card 2: Basic WebRTC Client
+### [x] Card 4: Basic WebRTC Client
 *   **Goal**: Build the browser UI to test the signaling API.
 *   **Tasks**:
     *   Update `client/index.html` and `client/app.js`.
@@ -68,14 +71,23 @@ graph TD
 *   **Tasks**:
     *   Create `src/gateway/audio_track.py`.
     *   Inherit from `aiortc.MediaStreamTrack`.
-    *   **Inbound**: Route WebRTC mic audio to Card 3 (STT).
-    *   **Outbound**: Route Card 4 (TTS) audio to the WebRTC speaker.
-*   **Dependencies**: Requires **Card 1**, **Card 3**, and **Card 4**.
+    *   **Inbound**: Route WebRTC mic audio to Card 2 (STT).
+    *   **Outbound**: Route Card 3 (TTS) audio to the WebRTC speaker.
+*   **Dependencies**: Requires **Card 1**, **Card 2**, and **Card 3**.
 
-### [x] Card 6: Session Manager
+### [ ] Card 6: VAD & Barge-in
+*   **Goal**: Decide when the user is actually speaking (vs silence/noise) and drive interruption of agent playback—WebRTC carries audio but does not define this behavior.
+*   **Tasks**:
+    *   Choose VAD source: client-side (energy/Web Audio), gateway-side on inbound audio, STT endpointing/partial confidence, or a combination; document the choice.
+    *   Emit `barge_in.detected` (and optional `speech_started` / `speech_ended`) on the gateway ↔ orchestrator event bus per `system design/02-component-voice-realtime.md`.
+    *   Wire `speak.cancel` to the TTS path when barge-in fires; define policy for abandoning pending tool calls (orchestrator contract).
+    *   Tune thresholds / false-positive handling; add metrics (interrupt rate, false barge-in rate).
+*   **Dependencies**: Requires **Card 5** (bidirectional audio path in place).
+
+### [x] Card 7: Session Manager
 *   **Goal**: Manage the lifecycle of a call and emit system events.
 *   **Tasks**:
     *   Create `src/gateway/session.py`.
-    *   Bind the PeerConnection, Audio Track, and Orchestrator events together.
+    *   Bind the PeerConnection, Audio Track, and Orchestrator events together; **extend** with **Card 6** (`barge_in.detected`, `speak.cancel`) when VAD is implemented.
     *   Handle client disconnects and garbage collection/cleanup.
-*   **Dependencies**: Requires **Card 5**.
+*   **Dependencies**: Requires **Card 5**. Integrate **Card 6** for full barge-in behavior.
