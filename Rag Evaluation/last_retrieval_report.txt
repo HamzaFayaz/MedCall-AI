@@ -1,0 +1,246 @@
+RAG retrieval evaluation
+golden: D:\Github\AI\AI Voice Agents\Voice  Agent\Rag Evaluation\golden_cases.json
+generated: 2026-05-13T05:35:52.528137+00:00
+
+
+========================================================================
+case: parking_main_campus
+result: PASS — matched at rank 1
+
+query:
+  Where do I park?
+
+expect:
+  status='ok'
+  file='faq_and_call_scripts.md'
+  section='Parking'
+  max_rank=3
+
+retrieved chunks (vector index):
+  [1] faq_and_call_scripts.md — 'Parking'  score=0.67676549584421
+      Question examples: - Where do I park? - Is parking free? - Do you have valet? Approved answer: "For the main campus, use the East Parking Garage off Mercy Boulevard. Parking is $3 for the first two hours and $1 for each additional hour. Valet parking is available at the main entrance for $10. At Mercy North Clinic, patients may use the free surface lot behind the clinic."
+  [2] mercy_general_operational_policy.md — 'Parking And Arrival Instructions'  score=0.619156144837032
+      Main campus patients should use the East Parking Garage off Mercy Boulevard. Parking is $3 for the first two hours and $1 for each additional hour. Valet parking is available at the main entrance for $10. Patients visiting Mercy North Clinic may use the surface lot behind the clinic building. Parking at the North Clinic is free for scheduled appointments. Patients with mobility needs may be dropped off at the main entrance. Wheelchair assistance is available at the information desk. Patients...
+  [3] mercy_general_operational_policy.md — 'Facility Locations And Hours'  score=0.475763631236151
+      Mercy General Hospital & Outpatient Center is located at 4500 Mercy Boulevard, Seattle, WA 98104. Mercy North Clinic is located at 1200 Northgate Way, Seattle, WA 98125. Outpatient clinic hours are Monday through Friday from 7:00 AM to 7:00 PM. Saturday urgent care hours are 8:00 AM to 2:00 PM. Outpatient clinics are closed on Sunday. The Emergency Department is open 24 hours a day, 7 days a week. The main hospital line is (555) 800-0000. The Emergency Department direct line is (555) 800-9111...
+  [4] faq_and_call_scripts.md — 'Self-Pay'  score=0.36666332277088
+      Question examples: - I do not have insurance. Can I still be seen? - How much is self-pay? - Do you offer payment plans? Approved answer: "Yes, Mercy General treats patients regardless of insurance status. Self-pay patients receive a 20% discount if payment is made at the time of service. A standard new patient consult is usually $250 to $400 depending on complexity. Financial counselors can discuss payment options."
+
+========================================================================
+case: medicaid_accepted
+result: PASS — matched at rank 1
+
+query:
+  Do you take Medicaid?
+
+expect:
+  status='ok'
+  file='faq_and_call_scripts.md'
+  section='Insurance Accepted'
+  max_rank=3
+
+retrieved chunks (vector index):
+  [1] faq_and_call_scripts.md — 'Insurance Accepted'  score=0.628925563419391
+      Question examples: - Do you take my insurance? - Is Aetna accepted? - Do you accept Medicaid? Approved answer: "Mercy General accepts Blue Cross Blue Shield, Aetna, Cigna, UnitedHealthcare, Medicare, Humana Medicare Advantage, and Washington Apple Health for eligible services. Washington Apple Health is accepted for Primary Care and Pediatrics, while specialist visits usually require pre-authorization. Final coverage is confirmed by billing."
+  [2] faq_and_call_scripts.md — 'Self-Pay'  score=0.535965700272737
+      Question examples: - I do not have insurance. Can I still be seen? - How much is self-pay? - Do you offer payment plans? Approved answer: "Yes, Mercy General treats patients regardless of insurance status. Self-pay patients receive a 20% discount if payment is made at the time of service. A standard new patient consult is usually $250 to $400 depending on complexity. Financial counselors can discuss payment options."
+  [3] mercy_general_operational_policy.md — 'Accepted Insurance And Billing Rules'  score=0.530699418303952
+      Mercy General accepts Blue Cross Blue Shield, Aetna, Cigna, UnitedHealthcare, Medicare Parts A and B, Humana Medicare Advantage, and Washington Apple Health for eligible services. Washington Apple Health is accepted for Primary Care and Pediatrics. Specialist visits with Washington Apple Health generally require prior authorization. Cardiology, General Surgery, Neurology, and Gastroenterology visits may require a referral depending on the patient's insurance plan and the reason for visit. Out...
+  [4] mercy_general_operational_policy.md — 'Facility Locations And Hours'  score=0.414378906966249
+      Mercy General Hospital & Outpatient Center is located at 4500 Mercy Boulevard, Seattle, WA 98104. Mercy North Clinic is located at 1200 Northgate Way, Seattle, WA 98125. Outpatient clinic hours are Monday through Friday from 7:00 AM to 7:00 PM. Saturday urgent care hours are 8:00 AM to 2:00 PM. Outpatient clinics are closed on Sunday. The Emergency Department is open 24 hours a day, 7 days a week. The main hospital line is (555) 800-0000. The Emergency Department direct line is (555) 800-9111...
+
+========================================================================
+case: orthopedics_what_to_bring
+result: PASS — matched any_of at rank 1
+
+query:
+  What should I bring to orthopedics?
+
+expect:
+  status='ok'
+  any_of:
+    faq_and_call_scripts.md — section 'What To Bring'
+    mercy_general_operational_policy.md — section contains 'Appointment Preparation'
+    department_services.md — section 'Orthopedics And Sports Medicine'
+
+retrieved chunks (vector index):
+  [1] department_services.md — 'Orthopedics And Sports Medicine'  score=0.622558020607928
+      Orthopedics and Sports Medicine handles bones, joints, ligaments, tendons, muscles, sports injuries, sprains, strains, joint pain, knee pain, hip pain, shoulder pain, spine-related musculoskeletal concerns, and joint replacement consultations. Patients should bring recent outside X-rays, MRI discs, imaging reports, physical therapy notes, or injury reports when available. Severe injuries, visible deformity, severe bleeding, numb or cold limbs, or major trauma should be routed to Emergency Med...
+  [2] mercy_general_operational_policy.md — 'Appointment Preparation'  score=0.603872281866422
+      Patients should bring a photo ID, insurance card, current medication list or medication bottles, allergy information, and any relevant outside medical records. New patients should complete pre-registration forms before arrival when possible. If MyChart pre-registration is unavailable, patients may complete forms at check-in. For Pediatrics, a parent or legal guardian should attend the visit and bring vaccination records for new patients. For Orthopedics and Sports Medicine, patients should br...
+  [3] faq_and_call_scripts.md — 'What To Bring'  score=0.595980068404728
+      Question examples: - What should I bring to my appointment? - Do I need my insurance card? - Should I bring medications? Approved answer: "Please bring a photo ID, insurance card, current medication list or medication bottles, allergy information, and any outside records related to the visit."
+  [4] symptom_department_routing_guide.md — 'Joint Pain, Sprain, Or Sports Injury'  score=0.524613609531989
+      Orthopedics and Sports Medicine is the usual department for joint pain, sprains, strains, knee pain, hip pain, shoulder pain, sports injuries, and musculoskeletal injuries. Primary Care may be appropriate for mild or unclear joint pain, general aches, or chronic pain that has not yet been evaluated. Patients seeing Orthopedics should bring recent outside X-rays, MRI discs, imaging reports, physical therapy notes, or injury reports if available. Emergency Department routing applies for visible...
+  [5] mercy_general_operational_policy.md — 'Referral Requirements'  score=0.426977937455683
+      Primary Care and Pediatrics may usually be scheduled directly. Cardiology requires a referral from a Primary Care Provider unless the patient has a PPO insurance plan or the scheduling team confirms an exception. Orthopedics and Sports Medicine can often be scheduled directly for injuries, joint pain, sports injuries, and follow-up after imaging. Patients should bring any outside X-rays, MRI discs, or imaging reports. General Surgery requires a referral for most non-urgent consults. Gastroent...
+  [6] symptom_department_routing_guide.md — 'Back Pain'  score=0.426669165330246
+      Back pain usually starts with Primary Care when symptoms are mild, gradual, or unclear. Orthopedics and Sports Medicine may be appropriate for injury-related back pain, sports injuries, joint or spine concerns, or movement-related pain. Neurology may be appropriate by PCP referral when back pain is associated with persistent nerve symptoms, weakness, numbness, or neurologic concerns. Emergency Department routing applies for severe trauma, new leg weakness, loss of bladder or bowel control, nu...
+
+========================================================================
+case: belly_pain_routing
+result: PASS — matched at rank 1
+
+query:
+  I have belly pain
+
+expect:
+  status='ok'
+  file='symptom_department_routing_guide.md'
+  section='Belly Pain Or Abdominal Pain'
+  max_rank=3
+
+retrieved chunks (vector index):
+  [1] symptom_department_routing_guide.md — 'Belly Pain Or Abdominal Pain'  score=0.636414555967905
+      Belly pain or abdominal pain usually starts with Primary Care when symptoms are mild, ongoing, or unclear. Gastroenterology may be appropriate for chronic or recurring digestive symptoms, reflux, ulcers, colonoscopy-related questions, liver concerns, or digestive problems that need a specialist. General Surgery may be appropriate only when a clinician has referred the patient for a surgical concern such as appendix, gallbladder, hernia, or another abdominal surgery consult. General Surgery co...
+  [2] symptom_department_routing_guide.md — 'Hernia, Gallbladder, Appendix, Or Surgical Consultation'  score=0.493517652788675
+      Primary Care is the usual starting point when the patient is unsure whether surgery is needed. General Surgery handles referral-based consultations for abdominal surgery concerns, hernia repair, gallbladder concerns, appendix-related concerns, minimally invasive surgery, and trauma surgery follow-up. General Surgery consultations are referral only. Emergency Department routing applies for severe abdominal pain, severe injury, uncontrolled bleeding, fainting, or symptoms that feel life-threate...
+  [3] symptom_department_routing_guide.md — 'Urinary Symptoms'  score=0.482055168971327
+      Mercy General does not list Urology in the current doctor directory. Primary Care is the usual starting point for burning with urination, frequent urination, possible UTI symptoms, bladder discomfort, or unclear urinary concerns. Women's Health may be appropriate when urinary symptoms are related to pregnancy, gynecologic concerns, or reproductive health concerns. Emergency Department routing applies for severe back pain with fever, confusion, inability to urinate, pregnancy with severe sympt...
+  [4] symptom_department_routing_guide.md — 'Digestive Or Gastrointestinal Concern'  score=0.44892300280322
+      Primary Care is the usual starting point for new digestive symptoms when there is no existing specialist referral. Gastroenterology handles digestive system concerns, ulcers, colonoscopy-related questions, chronic reflux, recurring abdominal symptoms, liver concerns, and other GI issues. Emergency Department routing applies for severe abdominal pain, vomiting blood, black or bloody stool, fainting, severe dehydration, or severe pain after injury.
+
+========================================================================
+case: neck_pain_routing
+result: PASS — matched at rank 1
+
+query:
+  I have neck pain
+
+expect:
+  status='ok'
+  file='symptom_department_routing_guide.md'
+  section='Neck Pain'
+  max_rank=3
+
+retrieved chunks (vector index):
+  [1] symptom_department_routing_guide.md — 'Neck Pain'  score=0.6103450301186
+      Neck pain usually starts with Primary Care when the cause is unclear or not related to a major injury. Orthopedics and Sports Medicine may be appropriate when neck pain is related to an injury, movement problem, muscle strain, joint concern, or spine-related musculoskeletal issue. Neurology may be appropriate by PCP referral when neck pain is associated with persistent numbness, weakness, nerve symptoms, severe migraines, or other nervous-system concerns. Neurology requires PCP referral. Emer...
+  [2] symptom_department_routing_guide.md — 'Headache, Numbness, Weakness, Dizziness, Seizure, Or Memory Concern'  score=0.479391922333693
+      Primary Care is the usual starting point for non-emergency headaches, dizziness, mild memory concerns, or symptoms that need initial evaluation. Neurology handles nervous-system, brain, stroke recovery, severe migraine, seizure, persistent numbness, weakness, memory, and movement-related concerns. Neurology requires PCP referral. Emergency Department routing applies for sudden worst headache, facial drooping, sudden weakness, trouble speaking, sudden confusion, fainting, seizure, severe head...
+  [3] symptom_department_routing_guide.md — 'Back Pain'  score=0.447276461449898
+      Back pain usually starts with Primary Care when symptoms are mild, gradual, or unclear. Orthopedics and Sports Medicine may be appropriate for injury-related back pain, sports injuries, joint or spine concerns, or movement-related pain. Neurology may be appropriate by PCP referral when back pain is associated with persistent nerve symptoms, weakness, numbness, or neurologic concerns. Emergency Department routing applies for severe trauma, new leg weakness, loss of bladder or bowel control, nu...
+  [4] department_services.md — 'Neurology'  score=0.416465120121862
+      Neurology handles nervous-system concerns, brain disorders, stroke recovery, severe migraines, seizures, persistent numbness, weakness, memory concerns, and movement-related concerns. Neurology requires PCP referral. Sudden weakness, facial drooping, trouble speaking, sudden confusion, sudden worst headache, seizure, fainting, severe head injury, or vision loss should be routed to Emergency Medicine.
+
+========================================================================
+case: cardiology_direct_booking
+result: PASS — matched any_of at rank 1
+
+query:
+  Can I book cardiology directly?
+
+expect:
+  status='ok'
+  any_of:
+    faq_and_call_scripts.md — section 'Specialist Referral'
+    department_services.md — section 'Cardiology'
+    mercy_general_operational_policy.md — section 'Referral Requirements'
+
+retrieved chunks (vector index):
+  [1] department_services.md — 'Cardiology'  score=0.63652626605968
+      Cardiology handles heart and blood vessel concerns, including heart attack follow-up, murmurs, chronic chest pain after emergency evaluation, arrhythmias, electrophysiology concerns, stents, angioplasty, and other heart-related specialty visits. Cardiology requires PCP referral. If the caller has current chest pain, trouble breathing, fainting, sudden weakness, or stroke-like symptoms, route to Emergency Medicine instead of routine Cardiology scheduling.
+  [2] faq_and_call_scripts.md — 'Specialist Referral'  score=0.605303582500585
+      Question examples: - Do I need a referral? - Can I book directly with Cardiology? - Can I see a specialist without Primary Care? Approved answer: "Primary Care and Pediatrics can usually be scheduled directly. Cardiology, General Surgery, Gastroenterology, and Neurology often require a referral depending on the reason for visit and insurance plan. I can help schedule Primary Care or connect you with staff if you are unsure."
+  [3] symptom_department_routing_guide.md — 'Heart Or Blood Vessel Concern'  score=0.58982905805043
+      Primary Care is the usual starting point for non-emergency heart concerns when the patient does not already have a cardiology referral. Cardiology handles heart and blood vessel concerns such as heart attack follow-up, murmurs, arrhythmias, chronic chest pain after emergency evaluation, interventional cardiology, stents, angioplasty, and electrophysiology. Cardiology requires PCP referral. Emergency Department routing applies for chest pain, trouble breathing, fainting, stroke-like symptoms,...
+  [4] mercy_general_operational_policy.md — 'Accepted Insurance And Billing Rules'  score=0.547629334916978
+      Mercy General accepts Blue Cross Blue Shield, Aetna, Cigna, UnitedHealthcare, Medicare Parts A and B, Humana Medicare Advantage, and Washington Apple Health for eligible services. Washington Apple Health is accepted for Primary Care and Pediatrics. Specialist visits with Washington Apple Health generally require prior authorization. Cardiology, General Surgery, Neurology, and Gastroenterology visits may require a referral depending on the patient's insurance plan and the reason for visit. Out...
+  [5] mercy_general_operational_policy.md — 'Referral Requirements'  score=0.537074115158065
+      Primary Care and Pediatrics may usually be scheduled directly. Cardiology requires a referral from a Primary Care Provider unless the patient has a PPO insurance plan or the scheduling team confirms an exception. Orthopedics and Sports Medicine can often be scheduled directly for injuries, joint pain, sports injuries, and follow-up after imaging. Patients should bring any outside X-rays, MRI discs, or imaging reports. General Surgery requires a referral for most non-urgent consults. Gastroent...
+  [6] faq_and_call_scripts.md — 'Insurance Accepted'  score=0.497440710576035
+      Question examples: - Do you take my insurance? - Is Aetna accepted? - Do you accept Medicaid? Approved answer: "Mercy General accepts Blue Cross Blue Shield, Aetna, Cigna, UnitedHealthcare, Medicare, Humana Medicare Advantage, and Washington Apple Health for eligible services. Washington Apple Health is accepted for Primary Care and Pediatrics, while specialist visits usually require pre-authorization. Final coverage is confirmed by billing."
+
+========================================================================
+case: emergency_chest_pain_breathing
+result: PASS — emergency keywords detected
+
+query:
+  I have chest pain and trouble breathing
+
+expect: emergency keywords in query (no RAG retrieval for this case)
+
+(no retrieval payload for this case type)
+
+========================================================================
+case: dermatology_not_offered_routing
+result: PASS — matched at rank 1
+
+query:
+  Do you have dermatology?
+
+expect:
+  status='ok'
+  file='symptom_department_routing_guide.md'
+  section='Skin Rash, Mole, Or Skin Concern'
+  max_rank=3
+
+retrieved chunks (vector index):
+  [1] symptom_department_routing_guide.md — 'Skin Rash, Mole, Or Skin Concern'  score=0.663074581742509
+      Mercy General does not list Dermatology in the current doctor directory. Primary Care is the usual starting point for skin rash, mole concerns, acne concerns, mild skin irritation, or unclear skin symptoms. If a dermatologist is needed, Primary Care can guide the referral or the front desk can help with external referral instructions. Emergency Department routing applies for severe allergic reaction, trouble breathing, swelling of the face or throat, fever with rapidly spreading rash, or seve...
+  [2] mercy_general_operational_policy.md — 'Facility Locations And Hours'  score=0.448673463632213
+      Mercy General Hospital & Outpatient Center is located at 4500 Mercy Boulevard, Seattle, WA 98104. Mercy North Clinic is located at 1200 Northgate Way, Seattle, WA 98125. Outpatient clinic hours are Monday through Friday from 7:00 AM to 7:00 PM. Saturday urgent care hours are 8:00 AM to 2:00 PM. Outpatient clinics are closed on Sunday. The Emergency Department is open 24 hours a day, 7 days a week. The main hospital line is (555) 800-0000. The Emergency Department direct line is (555) 800-9111...
+  [3] faq_and_call_scripts.md — 'Insurance Accepted'  score=0.4471723661775
+      Question examples: - Do you take my insurance? - Is Aetna accepted? - Do you accept Medicaid? Approved answer: "Mercy General accepts Blue Cross Blue Shield, Aetna, Cigna, UnitedHealthcare, Medicare, Humana Medicare Advantage, and Washington Apple Health for eligible services. Washington Apple Health is accepted for Primary Care and Pediatrics, while specialist visits usually require pre-authorization. Final coverage is confirmed by billing."
+  [4] mercy_general_operational_policy.md — 'Accepted Insurance And Billing Rules'  score=0.444369262390541
+      Mercy General accepts Blue Cross Blue Shield, Aetna, Cigna, UnitedHealthcare, Medicare Parts A and B, Humana Medicare Advantage, and Washington Apple Health for eligible services. Washington Apple Health is accepted for Primary Care and Pediatrics. Specialist visits with Washington Apple Health generally require prior authorization. Cardiology, General Surgery, Neurology, and Gastroenterology visits may require a referral depending on the patient's insurance plan and the reason for visit. Out...
+  [5] symptom_department_routing_guide.md — 'Routine Checkup, Preventive Care, Chronic Conditions, Or General Health'  score=0.428853156544382
+      Primary Care is the usual department for annual physicals, preventive care, chronic disease management, diabetes, hypertension, asthma follow-up, medication review, routine illness, and general adult health. Family Medicine sees patients of all ages. Internal Medicine focuses on adult patients. Pediatrics is used for patients ages 0-18.
+  [6] faq_and_call_scripts.md — 'Self-Pay'  score=0.423581365239623
+      Question examples: - I do not have insurance. Can I still be seen? - How much is self-pay? - Do you offer payment plans? Approved answer: "Yes, Mercy General treats patients regardless of insurance status. Self-pay patients receive a 20% discount if payment is made at the time of service. A standard new patient consult is usually $250 to $400 depending on complexity. Financial counselors can discuss payment options."
+
+========================================================================
+case: out_of_scope_booking_language
+result: PASS — ok
+
+query:
+  Book me an appointment for next Tuesday.
+
+expect:
+  status='out_of_scope'
+
+retrieved chunks: (none)
+
+========================================================================
+case: out_of_scope_availability_language
+result: PASS — ok
+
+query:
+  Is there an open appointment slot tomorrow?
+
+expect:
+  status='out_of_scope'
+
+retrieved chunks: (none)
+
+========================================================================
+case: out_of_scope_patient_clinical
+result: FAIL — status: got 'ok', want 'out_of_scope'
+
+query:
+  What are my current medications?
+
+expect:
+  status='out_of_scope'
+
+retrieved chunks (vector index):
+  [1] faq_and_call_scripts.md — 'Self-Pay'  score=0.483720273359424
+      Question examples: - I do not have insurance. Can I still be seen? - How much is self-pay? - Do you offer payment plans? Approved answer: "Yes, Mercy General treats patients regardless of insurance status. Self-pay patients receive a 20% discount if payment is made at the time of service. A standard new patient consult is usually $250 to $400 depending on complexity. Financial counselors can discuss payment options."
+  [2] faq_and_call_scripts.md — 'Insurance Accepted'  score=0.477350356456117
+      Question examples: - Do you take my insurance? - Is Aetna accepted? - Do you accept Medicaid? Approved answer: "Mercy General accepts Blue Cross Blue Shield, Aetna, Cigna, UnitedHealthcare, Medicare, Humana Medicare Advantage, and Washington Apple Health for eligible services. Washington Apple Health is accepted for Primary Care and Pediatrics, while specialist visits usually require pre-authorization. Final coverage is confirmed by billing."
+  [3] mercy_general_operational_policy.md — 'Accepted Insurance And Billing Rules'  score=0.462604451336693
+      Mercy General accepts Blue Cross Blue Shield, Aetna, Cigna, UnitedHealthcare, Medicare Parts A and B, Humana Medicare Advantage, and Washington Apple Health for eligible services. Washington Apple Health is accepted for Primary Care and Pediatrics. Specialist visits with Washington Apple Health generally require prior authorization. Cardiology, General Surgery, Neurology, and Gastroenterology visits may require a referral depending on the patient's insurance plan and the reason for visit. Out...
+  [4] mercy_general_operational_policy.md — 'Prescription Refills And Medical Records'  score=0.455223444674047
+      The assistant cannot authorize prescription refills, change medications, or provide medication instructions. For refills, patients should contact their pharmacy and ask the pharmacy to send an electronic refill request to the prescribing provider. Patients may also message their provider through MyChart. Patients can access many records through MyChart. Official printed copies or records sent to another facility are handled by Health Information Management. Approved assistant wording: "I cann...
+
+========================================================================
+case: empty_query
+result: PASS — ok
+
+query:
+     
+
+expect:
+  status='empty_query'
+
+retrieved chunks: (none)
