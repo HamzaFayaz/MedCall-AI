@@ -6,6 +6,136 @@ This document defines the **outer graph nodes** (conversation orchestration) and
 
 ---
 
+## 0. Nodes vs tools (what maps to what)
+
+**Tools are not nodes, and nodes are not tools.** They live at two different layers:
+
+| Layer | What it is | Cardinality |
+|-------|----------------|-------------|
+| **Node** | An **outer graph step** the orchestrator is in (policy stage: who may be scheduled, whether commits are legal, etc.). | **Exactly one** active node per session at a time. |
+| **Tool** | An **inner capability** the LLM may **invoke** (function call) to read/write EHR, query RAG, or hand off. | **Many tools** can be allowlisted **per node**; the model may call **zero, one, or many** tools in a single turn before speaking. |
+
+So the design is: **one node → an allowlist of tools (often 1–4; sometimes 0).** The LLM always runs **inside** the current node; it never “replaces” the graph. The orchestrator advances **nodes** on transitions (e.g. user confirmed slot → move to `CONFIRM_COMMIT`); it **filters** which **tools** exist in that node.
+
+**Special cases:**
+
+- **`EMERGENCY_GATE`:** typically **no** LLM tools—keyword / small classifier + hard transition.  
+- **`PLAY_911_SCRIPT` / `wrap_up`:** orchestrator-driven audio or copy; **no** tool menu unless you explicitly add telemetry-only hooks.  
+- **Dangerous writes** (e.g. `book_appointment`): appear **only** in `CONFIRM_COMMIT`, not in `SCHEDULING`, even though both are “about” scheduling.
+
+### Mermaid — layers: one active node, many possible tools
+
+```mermaid
+flowchart TB
+  subgraph outer["Outer graph (orchestrator FSM)"]
+    direction TB
+    A["Exactly ONE active node<br/>e.g. SCHEDULING"]
+  end
+
+  subgraph inner["Inner loop (LLM inside that node)"]
+    direction TB
+    L[LLM with node prompt + context]
+    AL["Allowlist: N tools<br/>(subset of global catalog)"]
+    L --> AL
+  end
+
+  A --> L
+  AL --> V{Orchestrator validates<br/>each tool_call}
+  V -->|allowed| B[EHR / RAG / ops backends]
+  V -->|not allowed| R[Reject or handoff]
+  B --> L
+```
+
+### Mermaid — node → allowed tools (summary map)
+
+*Edges mean “this tool may be offered to the LLM while in this node.” Some nodes intentionally expose **no** tools.*
+
+```mermaid
+flowchart LR
+  subgraph identify["PATIENT_IDENTIFY"]
+    n_pi[PATIENT_IDENTIFY]
+  end
+  subgraph verify["VERIFY_RETURNING"]
+    n_vr[VERIFY_RETURNING]
+  end
+  subgraph reg["REGISTER_SHELL_PROFILE"]
+    n_reg[REGISTER_SHELL_PROFILE]
+  end
+  subgraph route["CLINICAL_ROUTE"]
+    n_cr[CLINICAL_ROUTE]
+  end
+  subgraph sched["SCHEDULING"]
+    n_sch[SCHEDULING]
+  end
+  subgraph commit["CONFIRM_COMMIT"]
+    n_cc[CONFIRM_COMMIT]
+  end
+  subgraph rag["RAG_ANSWER"]
+    n_rag[RAG_ANSWER]
+  end
+  subgraph intake["INSURANCE_INTAKE"]
+    n_in[INSURANCE_INTAKE]
+  end
+  subgraph handoff["HUMAN_HANDOFF"]
+    n_ho[HUMAN_HANDOFF]
+  end
+
+  t_lookup[lookup_patient]
+  t_profile[get_patient_profile]
+  t_create[create_shell_patient]
+  t_pol[get_department_policies]
+  t_cc[note_chief_complaint]
+  t_sp[search_providers]
+  t_av[get_availability]
+  t_book[book_appointment]
+  t_res[reschedule_appointment]
+  t_can[cancel_appointment]
+  t_upd[update_appointment_intake_fields]
+  t_kb[retrieve_kb]
+  t_q[queue_staff_handoff]
+  t_no[notify_on_call]
+
+  n_pi --> t_lookup
+  n_vr --> t_lookup
+  n_vr --> t_profile
+  n_reg --> t_create
+  n_cr --> t_pol
+  n_cr --> t_cc
+  n_sch --> t_sp
+  n_sch --> t_av
+  n_cc --> t_book
+  n_cc --> t_res
+  n_cc --> t_can
+  n_cc --> t_upd
+  n_rag --> t_kb
+  n_in --> t_upd
+  n_ho --> t_q
+  n_ho --> t_no
+```
+
+### Mermaid — same tool, different nodes (optional overlap)
+
+`lookup_patient` is allowlisted in more than one node; **booking** tools stay isolated.
+
+```mermaid
+flowchart TB
+  t_lookup[lookup_patient]
+  n_pi[PATIENT_IDENTIFY]
+  n_vr[VERIFY_RETURNING]
+  n_pi --> t_lookup
+  n_vr --> t_lookup
+
+  t_book[book_appointment]
+  n_sch[SCHEDULING]
+  n_cc[CONFIRM_COMMIT]
+  n_sch -.->|not allowed| t_book
+  n_cc --> t_book
+```
+
+Legend: solid edge = tool is in the allowlist; dotted = **intentionally omitted** so the model cannot book from the scheduling node.
+
+---
+
 ## 1. Outer graph nodes (orchestrator)
 
 | Node ID | Purpose | PRD / feature tie-in |
