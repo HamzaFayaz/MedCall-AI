@@ -102,6 +102,25 @@ Expected provider/scheduling tools:
 
 The LLM can decide a department from the conversation, but real doctors and slots come from the EHR API/Supabase.
 
+## Held for Orchestrator (dependency summary)
+
+These **cards** and **behaviors** wait on the **conversation orchestrator** (policy + graph + tool allowlists). Design refs: `system design/01-main-system-design.md`, `system design/03-component-orchestration.md`.
+
+### Cards
+
+| Card | Relationship to orchestrator |
+|------|----------------------------|
+| **Card 6: Orchestrator Tool Contract** | **On hold** until orchestrator + LLM tool surface exist (e.g. `retrieve_policy_knowledge`, when to call RAG). |
+| **Card 7: Retrieval Evaluation** | **Mostly shippable without orchestrator** (golden JSON + `Rag Evaluation/evaluate_rag_retrieval.py`). **Follow-ups tied to orchestrator:** production **emergency gate before any RAG call**; **input guardrails** so patient-specific / clinical-profile turns never invoke RAG (orchestrator routes to EHR / handoff). Optional: extend golden cases once orchestrator integration tests exist. |
+| **Card 8: Answer Safety Evaluation** | **On hold** until the stack produces **final assistant answers** (orchestrator + LLM consuming retrieval/tools). |
+
+### Features / behaviors (orchestrator-owned)
+
+- **RAG tool contract:** expose retrieval only as an allowlisted tool in the right nodes; no ad-hoc bypass (Card 6).
+- **Emergency-first:** run `emergency_gate` on every turn **before** normal dialogue and **before** RAG retrieval in production (Card 7 intent in live system).
+- **Input guardrails:** intent / policy so live availability, booking side effects, identity, and **patient-specific clinical** queries use **EHR tools or handoff**, not the KB retriever (complements `OUT_OF_SCOPE_PATTERNS` in `src/rag/service.py`).
+- **Answer safety:** grounding, referral/emergency wording, “no invented departments” — exercised once orchestrator + LLM path exists (Card 8).
+
 ## Build Cards
 
 ### [x] Card 1: Supabase Vector Schema
@@ -210,7 +229,7 @@ Expected result shape:
 
 ### [ ] Card 6: Orchestrator Tool Contract
 
-Status: On hold. This card needs the orchestrator/LLM layer to exist first, so it is waiting for orchestrator/LLM implementation before work continues.
+Status: On hold — see **Held for Orchestrator** above. This card needs the orchestrator/LLM layer to exist first.
 
 Goal: Define how the LLM/orchestrator calls RAG.
 
@@ -222,7 +241,29 @@ Tasks:
 - Ensure emergency gate still runs before RAG retrieval.
 - Ensure final answer uses retrieved text only for hospital-specific facts.
 
+#### Out-of-scope queries: orchestrator (primary) and RAG (defense in depth)
+
+Per `system design/01-main-system-design.md`, the **conversation orchestrator** is the **policy enforcement point**: it owns emergency gating, confirmations, and **which tools are allowed in each graph node**. The LLM must not bypass it for side effects or for answering questions that require live systems.
+
+**Industry-style split**
+
+| Layer | Responsibility |
+|-------|----------------|
+| **Orchestrator** | Decide intent per turn (after `emergency_gate`). For patient-specific clinical questions (“my medications”, “my allergies”, “my test results”, “my medical record”), **do not invoke RAG**; route to **verified patient flows** (EHR / MyChart-style tools) or **human handoff**. For live scheduling, insurance eligibility, and booking side effects, use structured EHR tools only, not the KB retriever. |
+| **RAG service** | **Second line**: `retrieve_knowledge` in `src/rag/service.py` applies `OUT_OF_SCOPE_PATTERNS` so that if RAG is called anyway, queries that must never be grounded from the public KB still return `status: "out_of_scope"` with **no** vector matches (see golden cases such as live availability and patient-clinical wording). |
+
+**Why both matter**
+
+- Orchestrator routing avoids misleading answers and keeps PHI-shaped requests on authenticated APIs.
+- RAG-side blocking limits damage from a mis-wired call path and keeps evaluation honest (retrieval should not run for those query classes).
+
+**Implementation note**
+
+Rule-based patterns (regex) will not catch every natural phrasing (e.g. “What are my **current** medications?” vs “my medications”). The orchestrator should use **intent / node policy** as the main control; extend RAG patterns in parallel and keep them aligned with Card 7 golden cases.
+
 ### [ ] Card 7: Retrieval Evaluation
+
+Orchestrator note: golden retrieval script can run standalone; production-only checks (emergency before RAG, patient-specific guardrails) are listed under **Held for Orchestrator**.
 
 Goal: Prove the retriever returns the right approved chunks before answer generation.
 
@@ -247,6 +288,8 @@ Golden test queries:
 - "Do you have dermatology?"
 
 ### [ ] Card 8: Answer Safety Evaluation
+
+Status: On hold — see **Held for Orchestrator** (needs orchestrator + LLM answer path).
 
 Goal: Prove final assistant answers stay grounded, safe, and within hospital policy.
 
