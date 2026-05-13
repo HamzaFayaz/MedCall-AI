@@ -1,0 +1,142 @@
+[
+  {
+    "id": "parking_main_campus",
+    "query": "Where do I park?",
+    "top_k": 4,
+    "expect": {
+      "status": "ok",
+      "source_file": "faq_and_call_scripts.md",
+      "section": "Parking",
+      "max_rank": 3
+    }
+  },
+  {
+    "id": "medicaid_accepted",
+    "query": "Do you take Medicaid?",
+    "top_k": 4,
+    "expect": {
+      "status": "ok",
+      "source_file": "faq_and_call_scripts.md",
+      "section": "Insurance Accepted",
+      "max_rank": 3
+    }
+  },
+  {
+    "id": "orthopedics_what_to_bring",
+    "query": "What should I bring to orthopedics?",
+    "top_k": 6,
+    "expect": {
+      "status": "ok",
+      "max_rank": 3,
+      "any_of": [
+        {
+          "source_file": "faq_and_call_scripts.md",
+          "section": "What To Bring"
+        },
+        {
+          "source_file": "mercy_general_operational_policy.md",
+          "section_contains": "Appointment Preparation"
+        },
+        {
+          "source_file": "department_services.md",
+          "section": "Orthopedics And Sports Medicine"
+        }
+      ]
+    }
+  },
+  {
+    "id": "belly_pain_routing",
+    "query": "I have belly pain",
+    "top_k": 4,
+    "expect": {
+      "status": "ok",
+      "source_file": "symptom_department_routing_guide.md",
+      "section": "Belly Pain Or Abdominal Pain",
+      "max_rank": 3
+    }
+  },
+  {
+    "id": "neck_pain_routing",
+    "query": "I have neck pain",
+    "top_k": 4,
+    "expect": {
+      "status": "ok",
+      "source_file": "symptom_department_routing_guide.md",
+      "section": "Neck Pain",
+      "max_rank": 3
+    }
+  },
+  {
+    "id": "cardiology_direct_booking",
+    "query": "Can I book cardiology directly?",
+    "top_k": 6,
+    "expect": {
+      "status": "ok",
+      "max_rank": 3,
+      "any_of": [
+        {
+          "source_file": "faq_and_call_scripts.md",
+          "section": "Specialist Referral"
+        },
+        {
+          "source_file": "department_services.md",
+          "section": "Cardiology"
+        },
+        {
+          "source_file": "mercy_general_operational_policy.md",
+          "section": "Referral Requirements"
+        }
+      ]
+    }
+  },
+  {
+    "id": "emergency_chest_pain_breathing",
+    "query": "I have chest pain and trouble breathing",
+    "expect": {
+      "emergency_keyword_detected": true
+    }
+  },
+  {
+    "id": "dermatology_not_offered_routing",
+    "query": "Do you have dermatology?",
+    "top_k": 6,
+    "expect": {
+      "status": "ok",
+      "source_file": "symptom_department_routing_guide.md",
+      "section": "Skin Rash, Mole, Or Skin Concern",
+      "max_rank": 3
+    }
+  },
+  {
+    "id": "out_of_scope_booking_language",
+    "query": "Book me an appointment for next Tuesday.",
+    "top_k": 4,
+    "expect": {
+      "status": "out_of_scope"
+    }
+  },
+  {
+    "id": "out_of_scope_availability_language",
+    "query": "Is there an open appointment slot tomorrow?",
+    "top_k": 4,
+    "expect": {
+      "status": "out_of_scope"
+    }
+  },
+  {
+    "id": "out_of_scope_patient_clinical",
+    "query": "What are my current medications?",
+    "top_k": 4,
+    "expect": {
+      "status": "out_of_scope"
+    }
+  },
+  {
+    "id": "empty_query",
+    "query": "   ",
+    "top_k": 4,
+    "expect": {
+      "status": "empty_query"
+    }
+  }
+]
