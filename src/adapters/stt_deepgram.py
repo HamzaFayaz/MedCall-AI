@@ -12,12 +12,14 @@ class DeepgramSTTAdapter:
         self.api_key = os.getenv("DEEPGRAM_API_KEY")
         if not self.api_key:
             logger.error("DEEPGRAM_API_KEY environment variable is not set!")
-            
+
         self.client = DeepgramClient(self.api_key)
         self.connection = None
         self.sample_rate = sample_rate
         self.channels = channels
         self.on_transcript_callback = None
+        # ms of silence before Deepgram ends an utterance (was 300; higher = longer sentences stay together)
+        self.endpointing_ms = int(os.getenv("STT_ENDPOINTING_MS", "700"))
 
     def set_callback(self, callback):
         """
@@ -66,11 +68,13 @@ class DeepgramSTTAdapter:
                 channels=self.channels,
                 sample_rate=self.sample_rate,
                 interim_results=True,
-                endpointing=300,
+                endpointing=self.endpointing_ms,
                 smart_format=True,
             )
 
-            logger.info("Connecting to Deepgram STT...")
+            logger.info(
+                f"Connecting to Deepgram STT (endpointing={self.endpointing_ms}ms)..."
+            )
             if await self.connection.start(options) is False:
                 logger.error("Failed to connect to Deepgram STT.")
                 return False

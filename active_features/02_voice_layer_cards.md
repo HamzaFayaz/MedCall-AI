@@ -75,13 +75,13 @@ graph TD
     *   **Outbound**: Route Card 3 (TTS) audio to the WebRTC speaker.
 *   **Dependencies**: Requires **Card 1**, **Card 2**, and **Card 3**.
 
-### [ ] Card 6: VAD & Barge-in
+### [x] Card 6: VAD & Barge-in
 *   **Goal**: Decide when the user is actually speaking (vs silence/noise) and drive interruption of agent playback—WebRTC carries audio but does not define this behavior.
 *   **Tasks**:
-    *   Choose VAD source: client-side (energy/Web Audio), gateway-side on inbound audio, STT endpointing/partial confidence, or a combination; document the choice.
-    *   Emit `barge_in.detected` (and optional `speech_started` / `speech_ended`) on the gateway ↔ orchestrator event bus per `system design/02-component-voice-realtime.md`.
-    *   Wire `speak.cancel` to the TTS path when barge-in fires; define policy for abandoning pending tool calls (orchestrator contract).
-    *   Tune thresholds / false-positive handling; add metrics (interrupt rate, false barge-in rate).
+    *   [x] VAD: gateway RMS (`src/gateway/vad.py`) + STT partial backup + client data-channel hints (`client/app.js`).
+    *   [x] Emit `speech_started`, `speech_ended`, `barge_in.detected`, `speak.cancel` via `CallSession._emit_event` (+ WebRTC `events` data channel to browser).
+    *   [x] `speak.cancel` → `DeepgramTTSAdapter.cancel()` + `AgentAudioTrack.clear_playback()`; ignore STT finals during/after agent speech.
+    *   [x] Metrics: `BargeInMetrics` in `src/gateway/barge_in.py` (logged on session end); tune via `VAD_RMS_THRESHOLD` env.
 *   **Dependencies**: Requires **Card 5** (bidirectional audio path in place).
 
 ### [x] Card 7: Session Manager
