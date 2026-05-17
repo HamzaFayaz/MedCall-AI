@@ -341,29 +341,25 @@ erDiagram
   doctors ||--o{ appointments : has
   patients ||--o{ appointments : has
   patients ||--|| medical_profiles : has
-
   doctors {
     uuid id PK
     string specialty
-    jsonb raw_fhir_data
+    json raw_fhir_data
   }
-
   patients {
     uuid id PK
     string phone
     date dob
   }
-
   medical_profiles {
-    uuid patient_id PK_FK
-    jsonb clinical_data
+    uuid patient_id PK
+    json clinical_data
   }
-
   appointments {
     uuid id PK
     uuid patient_id FK
     uuid doctor_id FK
-    timestamptz appointment_time
+    timestamp appointment_time
     string status
     string reason
   }
