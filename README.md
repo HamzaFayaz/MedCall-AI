@@ -430,7 +430,7 @@ Start with the main design, then read the component documents in order:
 1. **Clone the repository and navigate to the directory:**
 
    ```bash
-   cd "Voice Agent"
+   cd "MedCall-AI"
    ```
 
 2. **Set up a Python virtual environment:**
@@ -470,7 +470,13 @@ Start with the main design, then read the component documents in order:
 
 ## Current Status
 
-- **Phase 1 complete:** Seed data acquisition is complete, and the curated Mercy General policy knowledge base is available under `data/knowledge_base/`.
-- **Phase 2 in progress:** Building the local EHR service and Supabase Vector RAG pipeline so the voice agent can make live API queries during patient calls.
-- **Voice layer in progress:** WebRTC gateway with Deepgram STT/TTS adapters; LangGraph orchestrator and full tool integration remain in progress.
-- **Architecture baseline complete:** The main system design and component documents define the WebRTC transport, LangGraph orchestration, EHR API boundary, RAG pipeline, and production trust posture.
+| Phase | Status | Summary |
+| ----- | ------ | ------- |
+| **Phase 1** — Data downloading | ✅ Complete | Synthea FHIR seed data; curated Mercy General knowledge base under `data/knowledge_base/` |
+| **Phase 2** — Data cleaning | ✅ Complete | 25 doctors extracted; patients processed and remapped; FHIR billing noise filtered for LLM context |
+| **Phase 3** — Feature definition | ✅ Complete | Core agent features, EHR API surface, and orchestration/tool requirements defined |
+| **Phase 4** — Database setup & migration | ✅ Complete | Supabase schema live; doctors and patients seeded; pgvector RAG store (`migrate_to_supabase.py`, `scripts/supabase_rag_vector_db.sql`) |
+| **Phase 5** — Voice & realtime layer (build Part 1) | ✅ Complete | WebRTC client (`client/`), realtime gateway (`src/gateway/`), Deepgram STT/TTS (`src/adapters/`), session manager, VAD & barge-in |
+| **Phase 6** — Orchestration, EHR, RAG & E2E | 🔄 **In progress** | LangGraph agent (`src/orchestrator/`), EHR REST API (`src/ehr/`), RAG ingest & retrieval (`src/rag/`), full end-to-end voice calls |
+
+System architecture and component specs are complete in [`system design/`](system%20design/). Build order for Phase 6: [`implementation_plan.md`](implementation_plan.md) · checklists: [`docs/project_plan.md`](docs/project_plan.md) · [`PRD.md`](PRD.md) §10.
