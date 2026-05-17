@@ -430,7 +430,7 @@ Start with the main design, then read the component documents in order:
 1. **Clone the repository and navigate to the directory:**
 
    ```bash
-   cd "Voice Agent"
+   cd "MedCall-AI"
    ```
 
 2. **Set up a Python virtual environment:**
