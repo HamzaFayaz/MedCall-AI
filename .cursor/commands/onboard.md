@@ -12,7 +12,7 @@ description: Onboard  cursor  into the codebase
 2. **Read key files**
    - PRD.md, to Understand the project 
    - read the progress.md  to understand how much work is complete
-   - read the currently_working_on.md to understand the current progressing
+   - read the currently_working_on.md to understand the current progressing, understanding of that component, discussing
    - Entry points and config files
    - Core schemas/models
 
