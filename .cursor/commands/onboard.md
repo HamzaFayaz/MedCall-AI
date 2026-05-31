@@ -33,3 +33,4 @@ Provide a brief summary:
 Breif summary Insturction:
 
 - Shorten it if possible , but do not cut the important details
+- just list that you understand the current working and what next
