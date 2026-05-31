@@ -33,6 +33,6 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=8000,
         reload=True,
-        # pyttsx3 writes comtypes stubs under venv on first speak — must not trigger reload
-        reload_excludes=["venv/*", ".venv/*"],
+        # Only watch app code; pyttsx3 writes comtypes stubs under venv on first speak
+        reload_dirs=["src", "client"],
     )

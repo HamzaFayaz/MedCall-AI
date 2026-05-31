@@ -34,13 +34,14 @@ class CallSession:
         event_handler: Optional[EventHandler] = None,
         assistant_handler: Optional[AssistantHandler] = None,
         on_close: Optional[CloseHandler] = None,
+        rtc_config: Optional[RTCConfiguration] = None,
     ):
         self.session_id = session_id or str(uuid.uuid4())
         self.event_handler = event_handler
         self.assistant_handler = assistant_handler
         self.on_close = on_close
 
-        self.pc = RTCPeerConnection()
+        self.pc = RTCPeerConnection(configuration=rtc_config)
         self.agent_track: Optional[AgentAudioTrack] = None
         self.stt: Optional[DeepgramSTTAdapter] = None
         self.tts = None

@@ -7,6 +7,7 @@ from src.logger import logger
 
 from src.gateway.events import log_gateway_event
 from src.gateway.session import CallSession
+from src.orchestrator import clear_session, handle_transcript
 
 webrtc_router = APIRouter(prefix="/webrtc", tags=["WebRTC Signaling"])
 
@@ -27,6 +28,7 @@ sessions = {}
 
 
 def _remove_session(session_id: str):
+    clear_session(session_id)
     sessions.pop(session_id, None)
 
 
@@ -55,6 +57,7 @@ async def offer(request: Request):
     config = RTCConfiguration(iceServers=ICE_SERVERS)
     session = CallSession(
         event_handler=log_gateway_event,
+        assistant_handler=handle_transcript,
         on_close=_remove_session,
         rtc_config=config,
     )
