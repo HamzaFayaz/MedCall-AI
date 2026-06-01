@@ -30,13 +30,13 @@ flowchart TD
 
 ## Implementation todos
 
-- [ ] Add `OrchestratorSessionState` + `session_lifecycle` (`start_session`, `get_session`, `end_session`)
-- [ ] Call `start_session` from `server.py` on WebRTC offer; refactor `__init__.py` to use state dict
-- [ ] Add `emergency_phrases.py` + `emergency_gate.py` with PRD categories and matcher
-- [ ] Run `check_emergency` at top of `handle_transcript`; return 911 script on hit; skip LLM
-- [ ] Add `tests/test_emergency_gate.py` and `tests/test_session_lifecycle.py`
-- [ ] Add `scripts/chat_terminal.py` for manual testing
-- [ ] Update checklist + `progress.md` when complete
+- [x] Add `OrchestratorSessionState` + `session_lifecycle` (`start_session`, `get_session`, `end_session`)
+- [x] Call `start_session` from `server.py` on WebRTC offer; refactor `__init__.py` to use state dict
+- [x] Add `emergency_phrases.py` + `emergency_gate.py` with PRD categories and matcher
+- [x] Run `check_emergency` at top of `handle_transcript`; return 911 script on hit; skip LLM
+- [x] Add `tests/test_emergency_gate.py` and `tests/test_session_lifecycle.py`
+- [x] Add `scripts/chat_terminal.py` for manual testing
+- [x] Update checklist + `progress.md` when complete
 
 ---
 
