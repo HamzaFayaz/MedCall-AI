@@ -7,7 +7,7 @@ from src.logger import logger
 
 from src.gateway.events import log_gateway_event
 from src.gateway.session import CallSession
-from src.orchestrator import clear_session, handle_transcript
+from src.orchestrator import clear_session, handle_transcript, start_session
 
 webrtc_router = APIRouter(prefix="/webrtc", tags=["WebRTC Signaling"])
 
@@ -62,6 +62,7 @@ async def offer(request: Request):
         rtc_config=config,
     )
     sessions[session.session_id] = session
+    start_session(session.session_id)
     logger.info(f"Created new CallSession {session.session_id}")
 
     try:
