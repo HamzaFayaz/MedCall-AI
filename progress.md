@@ -49,7 +49,9 @@ Track your progress through the Mercy General Voice Agent. Update this file as y
 
 **Implementation plans completed:** `.agent/Plans/02_voice_layer_cards.md`, `.agent/Plans/05_data_rag_cards.md`
 
-**Implementation plans not started:** Components 01 (main deploy), 03 (orchestration cards), 04 (EHR API cards), 06 (trust/ops)
+**Implementation plans in progress:** `.agent/Plans/03_orchestrator_cards.md` (index) · `.agent/Plans/03_orchestrator_01_session_start_emergency_gate.md` (sub-plan 01: `session_start`, `EMERGENCY_GATE`)
+
+**Implementation plans not started:** Components 01 (main deploy), 03 orchestrator sub-plans 02–06, 04 (EHR API cards), 06 (trust/ops)
 
 ### Phase 6: API & Integration Development — **in progress**
 
