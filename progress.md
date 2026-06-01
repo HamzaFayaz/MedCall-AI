@@ -57,7 +57,7 @@ Track your progress through the Mercy General Voice Agent. Update this file as y
 
 - [x] FastAPI app shell + health — `main.py`
 - [x] WebRTC client — `client/index.html`, `client/app.js`
-- [-] Voice path wired to minimal LLM chat — `src/gateway/` → `src/orchestrator/` (single `chat` node; no tools, no RAG, no EHR)
+- [-] Voice path wired to minimal LLM chat — `src/gateway/` → `src/orchestrator/` (single `chat` node; emergency gate + session lifecycle; no tools, no RAG, no EHR)
 - [ ] `ehr_server` / EHR REST endpoints — `src/ehr/routes/` stub only; design in `system design/04-component-backend-ehr.md`
 - [ ] Full LangGraph state machine — emergency gate, auth, scheduling, tool allowlists per `system design/03-component-orchestration.md`
 - [ ] End-to-end voice call: STT → orchestrator tools → EHR + RAG → TTS with citations and booking
@@ -107,12 +107,15 @@ Plan: [.agent/Plans/05_data_rag_cards.md](.agent/Plans/05_data_rag_cards.md) · 
 
 ---
 
-## Component 03: Orchestration — **in progress (stub only)**
+## Component 03: Orchestration — **in progress**
 
 Design: [system design/03-component-orchestration.md](system%20design/03-component-orchestration.md)
 
+Plan (sub-plan 01): [.agent/Plans/03_orchestrator_01_session_start_emergency_gate.md](.agent/Plans/03_orchestrator_01_session_start_emergency_gate.md)
+
 - [x] Minimal LangGraph chat wired to WebRTC STT finals — `src/orchestrator/graph.py`, `src/orchestrator/__init__.py`
-- [ ] Emergency gate on every utterance before graph advancement
+- [x] `session_start` + orchestrator session state — `src/orchestrator/state.py`, `session_lifecycle.py`; wired from `src/gateway/server.py`
+- [x] Emergency gate on every utterance before graph advancement — `emergency_gate.py`, `emergency_phrases.py`; PRD 911 script; tests in `tests/test_emergency_gate.py`, `tests/test_session_lifecycle.py`, `tests/test_handle_transcript.py`
 - [ ] Full call state machine (identification → routing → scheduling → insurance)
 - [ ] Tool allowlists per node (EHR + RAG tools)
 - [ ] RAG tool invocation from graph (depends on Component 05 Card 6)
