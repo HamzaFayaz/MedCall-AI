@@ -49,17 +49,19 @@ Track your progress through the Mercy General Voice Agent. Update this file as y
 
 **Implementation plans completed:** `.agent/Plans/02_voice_layer_cards.md`, `.agent/Plans/05_data_rag_cards.md`
 
-**Implementation plans in progress:** `.agent/Plans/03_orchestrator_cards.md` (index) · `.agent/Plans/03_orchestrator_01_session_start_emergency_gate.md` (sub-plan 01: `session_start`, `EMERGENCY_GATE`)
+**Implementation plans completed:** `.agent/Plans/03_orchestrator_01_session_start_emergency_gate.md` (sub-plan 01 — v1 behavior: session + keyword gate)
 
-**Implementation plans not started:** Components 01 (main deploy), 03 orchestrator sub-plans 02–06, 04 (EHR API cards), 06 (trust/ops)
+**Implementation plans in progress:** `.agent/Plans/03_orchestrator_cards.md` (index) · [03_orchestrator_02_langgraph_patient_identify.md](.agent/Plans/03_orchestrator_02_langgraph_patient_identify.md) (LangGraph step 0 + `PATIENT_IDENTIFY`)
+
+**Implementation plans not started:** Components 01 (main deploy), 03 orchestrator sub-plans 03–06, 04 (EHR API cards), 06 (trust/ops)
 
 ### Phase 6: API & Integration Development — **in progress**
 
 - [x] FastAPI app shell + health — `main.py`
 - [x] WebRTC client — `client/index.html`, `client/app.js`
-- [-] Voice path wired to minimal LLM chat — `src/gateway/` → `src/orchestrator/` (single `chat` node; emergency gate + session lifecycle; no tools, no RAG, no EHR)
+- [x] Voice path wired to orchestrator — `handle_transcript` thin adapter → LangGraph (`session_start`, `EMERGENCY_GATE`, `PATIENT_IDENTIFY`)
 - [ ] `ehr_server` / EHR REST endpoints — `src/ehr/routes/` stub only; design in `system design/04-component-backend-ehr.md`
-- [ ] Full LangGraph state machine — emergency gate, auth, scheduling, tool allowlists per `system design/03-component-orchestration.md`
+- [ ] Full call state machine (auth, scheduling, tools) — sub-plan 02+ (after LangGraph refactor)
 - [ ] End-to-end voice call: STT → orchestrator tools → EHR + RAG → TTS with citations and booking
 
 ---
@@ -113,12 +115,42 @@ Design: [system design/03-component-orchestration.md](system%20design/03-compone
 
 Plan (sub-plan 01): [.agent/Plans/03_orchestrator_01_session_start_emergency_gate.md](.agent/Plans/03_orchestrator_01_session_start_emergency_gate.md)
 
-- [x] Minimal LangGraph chat wired to WebRTC STT finals — `src/orchestrator/graph.py`, `src/orchestrator/__init__.py`
-- [x] `session_start` + orchestrator session state — `src/orchestrator/state.py`, `session_lifecycle.py`; wired from `src/gateway/server.py`
-- [x] Emergency gate on every utterance before graph advancement — `emergency_gate.py`, `emergency_phrases.py`; PRD 911 script; tests in `tests/test_emergency_gate.py`, `tests/test_session_lifecycle.py`, `tests/test_handle_transcript.py`
-- [ ] Full call state machine (identification → routing → scheduling → insurance)
-- [ ] Tool allowlists per node (EHR + RAG tools)
+### Sub-plan 01 — **complete** (v1: behavior outside LangGraph)
+
+- [x] Minimal LangGraph `chat` stub — `src/orchestrator/graph.py`
+- [x] Session fields + in-memory store — `state.py`, `session_lifecycle.py`; `start_session` from `server.py`
+- [x] Keyword emergency gate before LLM — `emergency_gate.py`, `emergency_phrases.py`; wired in `handle_transcript`
+- [x] Tests + `scripts/chat_terminal.py`
+
+*Note: `session_start` / `EMERGENCY_GATE` as **LangGraph nodes** + unified graph memory are **not** sub-plan 01 scope — they are **step 0 of sub-plan 02** (before `PATIENT_IDENTIFY`).*
+
+### Sub-plan 02 — **in progress** (prerequisite + first conversational nodes)
+
+**Step 0 — LangGraph refactor (do this before new nodes):**
+
+- [x] Single graph `CallState`: `messages`, `session_ended`, `emergency_*`, `active_node`, `patient_id`, … — `src/orchestrator/call_state.py`
+- [x] Move `session_start` + `EMERGENCY_GATE` into `StateGraph` (code-only nodes + conditional edges) — `src/orchestrator/graph.py`, `nodes/`
+- [x] Orchestration inside graph: session, emergency, routing, LLM — not in `__init__.py`
+- [x] **Thin `handle_transcript` adapter** (keep, shrink — do not delete):
+  - [x] Parse `event` (`session_id`, `text`); cheap guards (`if not text: return ""`)
+  - [x] `await graph.ainvoke(..., config={"configurable": {"thread_id": session_id}})`
+  - [x] Map final state → spoken `str` for gateway/TTS (`last_reply`)
+  - [x] Gateway + `chat_terminal.py` keep calling `handle_transcript` only (no LangGraph imports in `session.py`)
+- [x] One memory source of truth: graph state + `MemorySaver` checkpointer; `_sessions` synced after `ainvoke`
+- [x] Update tests for graph path — `tests/test_graph_emergency.py`, updated lifecycle/handle_transcript tests
+
+**Why thin adapter (not call graph from gateway directly):** stable voice↔orchestrator contract; separate gateway `CallSession` (media) from graph `thread_id` (conversation); one place to fix invoke/config; easier mocking; terminal and WebRTC stay identical.
+
+**Then — node implementation:**
+
+- [x] `PATIENT_IDENTIFY` — `nodes/patient_identify.py`, `tools/lookup_patient.py`, `prompts.py`; `VERIFY_RETURNING` / `REGISTER_SHELL_PROFILE` stubs
+- [ ] Tool allowlists per node (EHR tools as EHR API lands)
+
+### Later sub-plans (03+)
+
+- [ ] `CLINICAL_ROUTE`, `RAG_ANSWER`, `SCHEDULING`, …
 - [ ] RAG tool invocation from graph (depends on Component 05 Card 6)
+- [ ] Emergency v2: tune keywords + optional LLM for ambiguous utterances
 
 ---
 
