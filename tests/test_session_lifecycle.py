@@ -1,8 +1,7 @@
 import unittest
 
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage
 
-from src.orchestrator.graph import SYSTEM_PROMPT
 from src.orchestrator.session_lifecycle import (
     clear_session,
     end_session,
@@ -27,9 +26,8 @@ class TestSessionLifecycle(unittest.TestCase):
         self.assertIsNone(state.patient_id)
         self.assertFalse(state.session_ended)
         self.assertFalse(state.emergency_triggered)
-        self.assertEqual(len(state.messages), 1)
-        self.assertIsInstance(state.messages[0], SystemMessage)
-        self.assertEqual(state.messages[0].content, SYSTEM_PROMPT)
+        self.assertEqual(len(state.messages), 0)
+        self.assertEqual(state.lookup_attempts, 0)
 
     def test_get_session_returns_started_state(self):
         start_session("test-session-a")
@@ -47,7 +45,7 @@ class TestSessionLifecycle(unittest.TestCase):
         self.assertIs(again, state)
         self.assertEqual(again.utterance_count, 3)
         self.assertEqual(again.patient_id, "patient-123")
-        self.assertEqual(len(again.messages), 2)
+        self.assertEqual(len(again.messages), 1)
 
     def test_end_session_clears_state(self):
         start_session("test-session-a")
