@@ -14,7 +14,6 @@ from src.orchestrator.nodes.register_shell_profile import register_shell_profile
 from src.orchestrator.nodes.session_start import session_start
 from src.orchestrator.nodes.verify_returning import verify_returning
 from src.orchestrator.routing import (
-    route_active_node,
     route_after_emergency,
     route_after_patient_identify,
 )
