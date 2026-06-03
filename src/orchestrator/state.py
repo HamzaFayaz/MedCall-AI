@@ -4,6 +4,8 @@ from typing import Any, Optional
 
 from langchain_core.messages import BaseMessage
 
+from src.orchestrator.call_state import IdentityFields
+
 
 @dataclass
 class OrchestratorSessionState:
@@ -12,6 +14,11 @@ class OrchestratorSessionState:
     session_id: str
     active_node: str = "PATIENT_IDENTIFY"
     patient_id: Optional[str] = None
+    patient_type: Optional[str] = None
+    identity_fields: IdentityFields = field(default_factory=dict)
+    lookup_status: Optional[str] = None
+    lookup_attempts: int = 0
+    last_reply: str = ""
     proposed_slot: Optional[dict[str, Any]] = None
     appointment_id: Optional[str] = None
     session_ended: bool = False
